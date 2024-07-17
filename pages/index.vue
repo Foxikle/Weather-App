@@ -48,7 +48,7 @@ const wind = ref<string>('wind-speed');
 </script>
 
 <template>
-  <h1 class="text-5xl text-center m-6"> Current Weather</h1>
+  <h1 class="text-5xl text-center m-6"> Current Weather </h1>
 
   <div v-if="status === 'success'">
     <div class="flex text-center m-6">
