@@ -1,14 +1,24 @@
 <script lang="ts" setup>
 
 import {LineChart} from "~/components/ui/chart-line";
-import {CalendarDate, DateFormatter, getLocalTimeZone, today} from "@internationalized/date";
+import {DateFormatter, getLocalTimeZone, today} from "@internationalized/date";
 import {RangeCalendar} from '@/components/ui/range-calendar'
 import {Button} from '@/components/ui/button'
-
+import useUserPrefs from "~/composables/useUserPrefs";
 import type {DateRange} from "radix-vue";
 import {ref, type Ref} from "vue";
-import {calculateDewPoint, cn, type WeatherApiResponse} from "~/lib/utils";
-import {Popover, PopoverTrigger, PopoverContent} from "~/components/ui/popover";
+import {
+  calculateDewPoint,
+  cn,
+  convertDistance,
+  convertPower,
+  convertPressure,
+  convertSpeed,
+  convertTemperature,
+  toAbbreviation,
+  type WeatherApiResponse
+} from "~/lib/utils";
+import {Popover, PopoverContent, PopoverTrigger} from "~/components/ui/popover";
 import {Icon} from "@iconify/vue";
 
 const df = new DateFormatter('en-US', {
@@ -26,11 +36,14 @@ const dateRange = ref({
   end: today(getLocalTimeZone()).add({days: 1}),
 }) as Ref<DateRange>
 
+const {preferences} = useUserPrefs()
+
+
 watch(dateRange, (newValue) => {
   start_date.value = newValue.start?.toDate(getLocalTimeZone()).toISOString() ?? new Date().toISOString();
   end_date.value = newValue.end?.toDate(getLocalTimeZone()).toISOString() ?? new Date().toISOString();
 
-  if((start_date.value && end_date.value) && (start_date.value !== '' && end_date.value !== '')){
+  if ((start_date.value && end_date.value) && (start_date.value !== '' && end_date.value !== '')) {
     refresh()
   } else {
     console.log("Not refreshing")
@@ -49,32 +62,32 @@ const {data, status, error, refresh} = useFetch<WeatherApiResponse[]>('http://lo
 });
 
 const dewpoint = computed(() => {
-  if(data.value && data.value.length > 0) {
+  if (data.value && data.value.length > 0) {
     return data.value.map(item => ({
       datetime: datetimeFormatter.format(new Date(item.dateutc)),
-      Inside: calculateDewPoint(item.tempinf, item.humidityin, true),
-      Outside: calculateDewPoint(item.tempf, item.humidity, true)
+      Inside: calculateDewPoint(item.tempinf, preferences.value.temp, item.humidityin),
+      Outside: calculateDewPoint(item.tempf, preferences.value.temp, item.humidity)
     }));
   }
   return [];
 })
 
 const temperature = computed(() => {
-  if(data.value && data.value.length > 0) {
+  if (data.value && data.value.length > 0) {
     return data.value.map(item => ({
       datetime: datetimeFormatter.format(new Date(item.dateutc)),
-      Inside: item.tempinf,
-      Outside: item.tempf,
+      Inside: convertTemperature(item.tempinf, preferences.value.temp),
+      Outside: convertTemperature(item.tempf, preferences.value.temp),
     }));
   }
   return [];
 })
 
 const humidity = computed(() => {
-  if(data.value && data.value.length > 0) {
+  if (data.value && data.value.length > 0) {
     return data.value.map(item => ({
       datetime: datetimeFormatter.format(new Date(item.dateutc)),
-      Inside:  item.humidityin,
+      Inside: item.humidityin,
       Outside: item.humidity
     }));
   }
@@ -83,61 +96,77 @@ const humidity = computed(() => {
 
 // Light Tempurature
 const uv = computed(() => {
-  if(data.value && data.value.length > 0) {
+  if (data.value && data.value.length > 0) {
     return data.value.map(item => ({
       datetime: datetimeFormatter.format(new Date(item.dateutc)),
-      Outside:  item.uv,
+      Outside: item.uv, // not converted
     }));
   }
   return [];
 })
 
 const solar = computed(() => {
-  if(data.value && data.value.length > 0) {
+  if (data.value && data.value.length > 0) {
     return data.value.map(item => ({
       datetime: datetimeFormatter.format(new Date(item.dateutc)),
-      Outside:  item.solarradiation,
+      Outside: convertPower(item.solarradiation, preferences.value.power),
     }));
   }
   return [];
 })
 
 const bp = computed(() => {
-  if(data.value && data.value.length > 0) {
+  if (data.value && data.value.length > 0) {
     return data.value.map(item => ({
       datetime: datetimeFormatter.format(new Date(item.dateutc)),
-      Absolute:  item.baromabsin,
-      Relative:  item.baromrelin,
+      Absolute: convertPressure(item.baromabsin, preferences.value.pressure),
+      Relative: convertPressure(item.baromrelin, preferences.value.pressure),
     }));
   }
   return [];
 })
 
 const rain = computed(() => {
-  if(data.value && data.value.length > 0) {
+  if (data.value && data.value.length > 0) {
     return data.value.map(item => ({
       datetime: datetimeFormatter.format(new Date(item.dateutc)),
-      Hourly:  item.hourlyrainin,
-      Daily:  item.dailyrainin,
-      Weekly:  item.weeklyrainin,
-      Monthly:  item.dailyrainin,
-      Total:  item.totalrainin,
+      Hourly: convertDistance(item.hourlyrainin, preferences.value.distance),
+      Daily: convertDistance(item.dailyrainin, preferences.value.distance),
+      Weekly: convertDistance(item.weeklyrainin, preferences.value.distance),
+      Monthly: convertDistance(item.dailyrainin, preferences.value.distance),
+      Total: convertDistance(item.totalrainin, preferences.value.distance),
     }));
   }
   return [];
 })
 
 const wind = computed(() => {
-  if(data.value && data.value.length > 0) {
+  if (data.value && data.value.length > 0) {
     return data.value.map(item => ({
       datetime: datetimeFormatter.format(new Date(item.dateutc)),
-      Wind:  item.windspeedmph,
-      Gust:  item.windgustmph,
-      Max_Gust:  item.maxdailygust,
+      Wind: convertSpeed(item.windspeedmph, preferences.value.speed),
+      Gust: convertSpeed(item.windgustmph, preferences.value.speed),
+      Max_Gust: convertSpeed(item.maxdailygust, preferences.value.speed),
     }));
   }
   return [];
 })
+
+const battery = computed(() => {
+  if (data.value && data.value.length > 0) {
+    return data.value.map(item => ({
+      datetime: datetimeFormatter.format(new Date(item.dateutc)),
+      Base: item.batt_co2 * 100,
+      Sensor: item.battout * 100,
+    }));
+  }
+  return [];
+})
+
+function format(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).replaceAll("_", " ");
+}
+
 
 </script>
 
@@ -149,16 +178,17 @@ const wind = computed(() => {
       <Popover class="self-center">
         <PopoverTrigger as-child>
           <Button
-              variant="outline"
               :class="cn(
           'w-[280px] justify-start text-left font-normal',
           !dateRange && 'text-muted-foreground',
         )"
+              variant="outline"
           >
-            <Icon icon="mdi:calendar" class="mr-2 h-4 w-4" />
+            <Icon class="mr-2 h-4 w-4" icon="mdi:calendar"/>
             <template v-if="dateRange.start">
               <template v-if="dateRange.end">
-                {{ df.format(dateRange.start.toDate(getLocalTimeZone())) }} - {{ df.format(dateRange.end.toDate(getLocalTimeZone())) }}
+                {{ df.format(dateRange.start.toDate(getLocalTimeZone())) }} -
+                {{ df.format(dateRange.end.toDate(getLocalTimeZone())) }}
               </template>
 
               <template v-else>
@@ -171,36 +201,38 @@ const wind = computed(() => {
           </Button>
         </PopoverTrigger>
         <PopoverContent class="w-auto p-0">
-          <RangeCalendar v-model="dateRange" initial-focus :number-of-months="1" @update:start-value="(startDate) => dateRange.start = startDate" />
+          <RangeCalendar v-model="dateRange" :number-of-months="1" initial-focus
+                         @update:start-value="(startDate) => dateRange.start = startDate"/>
         </PopoverContent>
       </Popover>
     </div>
     <div class="grid-cols-1 xl:grid-cols-2 grid gap-2">
       <!--  Dewpoint chart -->
       <Card class="p-2 m-1">
-        <CardTitle>Dewpoint</CardTitle>
+        <CardTitle>Dewpoint ({{ format(preferences.temp) }})</CardTitle>
         <CardContent>
-          <LineChart :data="dewpoint" index="datetime"
-                     :categories="['Inside', 'Outside']"
+          <LineChart :categories="['Inside', 'Outside']" :data="dewpoint"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
-        ? ` ${new Intl.NumberFormat('us').format(tick).toString()}°F`
+        ? ` ${new Intl.NumberFormat('us').format(tick).toString() + toAbbreviation(preferences.temp)}`
         : ''
-  }"/>
+  }"
+                     index="datetime"/>
         </CardContent>
       </Card>
 
       <!--  Temperature chart -->
       <Card class="p-2 m-1">
-        <CardTitle>Temperature</CardTitle>
+        <CardTitle>Temperature ({{ format(preferences.temp) }})</CardTitle>
         <CardContent>
-          <LineChart :data="temperature" index="datetime"
-                     :categories="['Inside', 'Outside']"
+          <LineChart :categories="['Inside', 'Outside']" :data="temperature"
                      :y-formatter="(tick, i) => {
+
     return typeof tick === 'number'
-        ? ` ${new Intl.NumberFormat('us').format(tick).toString()}°F`
+        ? ` ${new Intl.NumberFormat('us').format(tick).toString() + toAbbreviation(preferences.temp)}`
         : ''
-  }"/>
+  }"
+                     index="datetime"/>
         </CardContent>
       </Card>
 
@@ -208,13 +240,13 @@ const wind = computed(() => {
       <Card class="p-2 m-1">
         <CardTitle>Relative Humidity</CardTitle>
         <CardContent>
-          <LineChart :data="humidity" index="datetime"
-                     :categories="['Inside', 'Outside']"
+          <LineChart :categories="['Inside', 'Outside']" :data="humidity"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
         ? ` ${new Intl.NumberFormat('us').format(tick).toString()}%`
         : ''
-  }"/>
+  }"
+                     index="datetime"/>
         </CardContent>
       </Card>
 
@@ -222,72 +254,85 @@ const wind = computed(() => {
       <Card class="p-2 m-1">
         <CardTitle>Ultraviolet Index</CardTitle>
         <CardContent>
-          <LineChart :data="uv" index="datetime"
-                     :categories="['Outside']"
+          <LineChart :categories="['Outside']" :data="uv"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
         ? ` ${new Intl.NumberFormat('us').format(tick).toString()}`
         : ''
-  }"/>
+  }"
+                     index="datetime"/>
         </CardContent>
       </Card>
 
       <!--  Solar Radiation chart -->
       <Card class="p-2 m-1">
-        <CardTitle>Solar Radiation</CardTitle>
+        <CardTitle>Solar Radiation ({{ format(preferences.power) }})</CardTitle>
         <CardContent>
-          <LineChart :data="solar" index="datetime"
-                     :categories="['Outside']"
+          <LineChart :categories="['Outside']" :data="solar"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
-        ? ` ${new Intl.NumberFormat('us').format(tick).toString()}`
+        ? ` ${new Intl.NumberFormat('us').format(tick).toString() + toAbbreviation(preferences.power)}`
         : ''
-  }"/>
+  }"
+                     index="datetime"/>
         </CardContent>
       </Card>
 
       <!--  Barometric Pressure chart -->
       <Card class="p-2 m-1">
-        <CardTitle>Barometric Pressure</CardTitle>
+        <CardTitle>Barometric Pressure ({{ format(preferences.pressure) }})</CardTitle>
         <CardContent>
-          <LineChart :data="bp" index="datetime"
-                     :categories="['Absolute', 'Relative']"
+          <LineChart :categories="['Absolute', 'Relative']" :data="bp"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
         ? ` ${new Intl.NumberFormat('us').format(tick).toString()}`
         : ''
-  }"/>
+  }"
+                     index="datetime"/>
         </CardContent>
       </Card>
 
       <!--  Rainfall chart -->
       <Card class="p-2 m-1">
-        <CardTitle>Rainfall</CardTitle>
+        <CardTitle>Rainfall ({{ format(preferences.distance) }})</CardTitle>
         <CardContent>
-          <LineChart :data="rain" index="datetime"
-                     :categories="['Hourly', 'Daily', 'Weekly', 'Monthly']"
+          <LineChart :categories="['Hourly', 'Daily', 'Weekly', 'Monthly']" :data="rain"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
-        ? ` ${new Intl.NumberFormat('us').format(tick).toString()}in`
+        ? ` ${new Intl.NumberFormat('us').format(tick).toString() + toAbbreviation(preferences.distance)}`
         : ''
-  }"/>
+  }"
+                     index="datetime"/>
         </CardContent>
       </Card>
 
       <!--  Windspeed chart -->
       <Card class="p-2 m-1">
-        <CardTitle>Wind Speed</CardTitle>
+        <CardTitle>Wind Speed ({{ format(preferences.speed) }})</CardTitle>
         <CardContent>
-          <LineChart :data="wind" index="datetime"
-                     :categories="['Wind', 'Gust', 'Max_Gust']"
+          <LineChart :categories="['Wind', 'Gust', 'Max_Gust']" :data="wind"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
-        ? ` ${new Intl.NumberFormat('us').format(tick).toString()}mph`
+        ? ` ${new Intl.NumberFormat('us').format(tick).toString() + toAbbreviation(preferences.speed)}`
         : ''
-  }"/>
+  }"
+                     index="datetime"/>
         </CardContent>
       </Card>
 
+      <!--  Battery Levels chart -->
+      <Card class="p-2 m-1">
+        <CardTitle>Batery Levels</CardTitle>
+        <CardContent>
+          <LineChart :categories="['Base', 'Sensor']" :data="battery"
+                     :y-formatter="(tick, i) => {
+    return typeof tick === 'number'
+        ? ` ${new Intl.NumberFormat('us').format(tick).toString()}%`
+        : ''
+  }"
+                     index="datetime"/>
+        </CardContent>
+      </Card>
     </div>
   </article>
 </template>

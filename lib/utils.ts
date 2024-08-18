@@ -7,22 +7,39 @@ export function cn(...inputs: ClassValue[]) {
 
 /**
  * Calculates the dew point with the given temperature and relative humidity
- * @param temp The tempeture, either in Celsius
+ * @param temp The temperature, either in Celsius, Fahrenheit, Kelvin, or Rankine
+ * @param unit The unit to export
  * @param humidity The relative humidity, as a number. (ie 67% would be 67)
- * @param isFahrenheit If the temperature is in Fahrenheit. This determines the unit of the output as well
  */
-export function calculateDewPoint(temp: number, humidity: number, isFahrenheit: boolean = false): number {
+export function calculateDewPoint(temp: number, unit: string, humidity: number): number {
+    // Convert the input temperature from Fahrenheit to Celsius
+    const tempCelsius = (temp - 32) * 5 / 9;
+
+    // Constants for the Magnus formula
     const a = 17.27;
-    const bCelsius = 237.7;
+    const b = 237.7;
 
-    const tempC = isFahrenheit ? (temp - 32) * 5 / 9 : temp;
+    // Calculate the dew point in Celsius using the Magnus formula
+    const alpha = (a * tempCelsius) / (b + tempCelsius) + Math.log(humidity / 100);
+    const dewPointCelsius = (b * alpha) / (a - alpha);
 
-    const alpha = (a * tempC) / (bCelsius + tempC) + Math.log(humidity / 100);
-    const dewPointCelsius = (bCelsius * alpha) / (a - alpha);
-
-
-    const dewPoint = isFahrenheit ? dewPointCelsius * 9 / 5 + 32 : dewPointCelsius;
-    return parseFloat(dewPoint.toPrecision(3));
+    // Convert the dew point to the desired output unit
+    let returnme = 0;
+    switch (unit) {
+        case 'fahrenheit':
+            returnme = dewPointCelsius * 9 / 5 + 32;
+            break
+        case 'kelvin':
+            returnme = dewPointCelsius + 273.15;
+            break
+        case 'rankine':
+            returnme = (dewPointCelsius + 273.15) * 9 / 5;
+            break
+        case 'celsius':
+        default:
+            returnme = dewPointCelsius;
+    }
+    return parseFloat(returnme.toFixed(1));
 }
 
 export function getUVIndex(value: number): string {
@@ -75,17 +92,20 @@ export interface WeatherApiResponse {
  * @param fahrenheit The temperature in FAHRENHEIT!
  * @param unit the unit to translate to
  */
-export function translateTemperature(fahrenheit: number, unit: string): number {
+export function convertTemperature(fahrenheit: number, unit: string): number {
+    let returnme = 0;
     if (unit === 'celsius') {
-        return (fahrenheit - 32) * 5 / 9;
+        returnme = (fahrenheit - 32) * 5 / 9;
     } else if (unit === 'kelvin') {
-        return ((fahrenheit - 32) * 5 / 9) + 273.15;
+        returnme = ((fahrenheit - 32) * 5 / 9) + 273.15;
     } else if (unit === 'rankine') {
-        return fahrenheit + 459.67;
-    } else return fahrenheit;
+        returnme = fahrenheit + 459.67;
+    } else returnme = fahrenheit;
+
+    return parseFloat(returnme.toFixed(1));
 }
 
-export function convertInches(inches: number, unit: string): number {
+export function convertDistance(inches: number, unit: string): number {
     const conversionFactors: { [key: string]: number } = {
         meters: 0.0254,
         miles: 1.5783e-5,
@@ -96,11 +116,12 @@ export function convertInches(inches: number, unit: string): number {
     };
 
     if (!conversionFactors.hasOwnProperty(unit)) {
-        return inches
+        return parseFloat(inches.toFixed(2));
     }
 
-    return inches * conversionFactors[unit];
+    return parseFloat((inches * conversionFactors[unit]).toFixed(2));
 }
+
 export function convertSpeed(mph: number, unit: string): number {
     const conversionFactors: { [key: string]: number } = {
         feet_per_minute: 88,
@@ -112,10 +133,10 @@ export function convertSpeed(mph: number, unit: string): number {
     };
 
     if (!conversionFactors.hasOwnProperty(unit)) {
-        return mph;
+        return parseFloat(mph.toFixed(1));
     }
 
-    return mph * conversionFactors[unit];
+    return parseFloat((mph * conversionFactors[unit]).toFixed(1));
 }
 
 export function convertPressure(inHg: number, unit: string): number {
@@ -130,33 +151,112 @@ export function convertPressure(inHg: number, unit: string): number {
     };
 
     if (!conversionFactors.hasOwnProperty(unit)) {
-        return  inHg;
+        return parseFloat(inHg.toFixed(2));
     }
 
-    return inHg * conversionFactors[unit];
+    return parseFloat((inHg * conversionFactors[unit]).toFixed(1));
 }
 
-export function convertAngle(deg: number, unit: string): number {
-    if(unit === 'radians') {
-        return deg * (Math.PI / 180);
-    }
-    return deg;
+export function convertAngle(deg: number | undefined, unit: string): number {
+    if (deg) {
+        if (unit === 'radians') {
+            return parseFloat((deg * (Math.PI / 180)).toFixed(5));
+        }
+        return parseFloat(deg.toFixed(1));
+    } else return 0;
 }
-
 
 export function convertPower(wattsPerSquareMeter: number, unit: string): number {
     const conversionFactors: { [key: string]: number } = {
-        Horsepower: 0.00134102,
-        'Calories per second': 0.2388459,
-        'btu/hr': 3.412142,
-        'decibel-miliwatts': 120,
+        horsepower: 0.00134102,
+        calories_per_second: 0.2388459,
+        btu_per_hr: 3.412142,
+        decibel_milliwatts: 120,
         megawatts: 1e-6,
         kilowatts: 0.001
     };
 
     if (!conversionFactors.hasOwnProperty(unit)) {
-        return wattsPerSquareMeter;
+        return parseFloat(wattsPerSquareMeter.toFixed(2));
     }
 
-    return wattsPerSquareMeter * conversionFactors[unit];
+    return parseFloat((wattsPerSquareMeter * conversionFactors[unit]).toFixed(2));
+}
+
+export function toAbbreviation(str: string): string {
+    switch (str) {
+        case 'horsepower':
+            return 'hp';
+        case 'calories_per_second':
+            return 'cal/s';
+        case 'btu_per_hour':
+            return 'btu/hr';
+        case 'decibel_milliwatts':
+            return 'dBm';
+        case 'megawatts':
+            return 'MW';
+        case 'kilowatts':
+            return 'kW';
+        case 'radians':
+            return 'rad';
+        case 'degrees':
+            return '°';
+        case 'rankine':
+            return '°R';
+        case 'kelvin':
+            return '°K';
+        case 'celsius':
+            return '°C';
+        case 'fahrenheit':
+            return '°F';
+        case 'millimeters_of_mercury':
+            return 'mmHg';
+        case 'pounds_per_square_inch':
+            return 'psi';
+        case 'pascals':
+            return 'Pa';
+        case 'kilopascals':
+            return 'kPa';
+        case 'atmospheres':
+            return 'atm';
+        case 'torr':
+            return 'torr';
+        case 'bar':
+            return 'bar';
+        case 'feet_per_minute':
+            return 'ft/min';
+        case 'feet_per_second':
+            return 'ft/sec';
+        case 'kilometers_per_hour':
+            return 'kmph';
+        case 'meters_per_minute':
+            return 'm/min';
+        case 'meters_per_second':
+            return 'm/s';
+        case 'furlongs_per_fortnight':
+            return 'flng/ftnt';
+        case 'meters':
+            return 'm';
+        case 'miles':
+            return 'mi';
+        case 'inches':
+            return 'in';
+        case 'millimeters':
+            return 'mm';
+        case 'centimeters':
+            return 'cm';
+        case 'furlongs':
+            return 'flng';
+        case 'rods':
+            return 'rods';
+        case 'miles_per_hour':
+            return 'mph';
+        case 'inches_of_mercury':
+            return 'inHg';
+        case 'watt':
+            return 'W';
+
+        default:
+            return 'ERR';
+    }
 }

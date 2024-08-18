@@ -1,6 +1,13 @@
 <script lang="ts" setup>
 import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from '@/components/ui/card'
-import {calculateDewPoint, getUVIndex, type WeatherApiResponse} from "~/lib/utils";
+import {
+  calculateDewPoint,
+  convertPressure,
+  convertTemperature,
+  getUVIndex,
+  toAbbreviation,
+  type WeatherApiResponse
+} from "~/lib/utils";
 import {
   Select,
   SelectContent,
@@ -11,15 +18,17 @@ import {
   SelectValue
 } from "~/components/ui/select";
 import {Progress} from "~/components/ui/progress";
+import useUserPrefs from "~/composables/useUserPrefs";
 
 const {data, status} = useFetch<WeatherApiResponse>('http://localhost:3000/api/v1/latest');
+const {preferences} = useUserPrefs()
 
 const tempIn = data.value?.tempinf ?? 0;
 const humidityIn = data.value?.humidityin ?? 0;
 const temp = data.value?.tempf ?? 0;
 const humidity = data.value?.humidity ?? 0;
-const dewpointIn = calculateDewPoint(tempIn, humidityIn, true);
-const dewpoint = calculateDewPoint(temp, humidity, true);
+const dewpointIn = calculateDewPoint(tempIn, preferences.value.temp, humidityIn);
+const dewpoint = calculateDewPoint(temp, preferences.value.temp, humidity);
 const windAngle = ref<number>(data.value?.winddir ?? 0);
 const uv = data.value?.uv ?? 0;
 const solarIntensity = data.value?.solarradiation ?? 0;
@@ -44,7 +53,6 @@ windMap.set('max-gust', data.value?.maxdailygust ?? 0);
 const rainfall = ref<string>('hourly-rain');
 const wind = ref<string>('wind-speed');
 
-
 </script>
 
 <template>
@@ -64,7 +72,7 @@ const wind = ref<string>('wind-speed');
                 Temperature
               </CardTitle>
               <CardContent class="text-6xl mt-4">
-                {{ tempIn }}°F
+                {{ convertTemperature(tempIn, preferences.temp) }}{{toAbbreviation(preferences.temp)}}
               </CardContent>
             </Card>
             <Card class="w-auto h-40 p-2">
@@ -80,7 +88,7 @@ const wind = ref<string>('wind-speed');
                 Dewpoint
               </CardTitle>
               <CardContent class="text-6xl mt-4">
-                {{ dewpointIn }}°F
+                {{ dewpointIn }}{{toAbbreviation(preferences.temp)}}
               </CardContent>
             </Card>
           </div>
@@ -93,7 +101,7 @@ const wind = ref<string>('wind-speed');
                 Temperature
               </CardTitle>
               <CardContent class="text-6xl mt-4">
-                {{ temp }}°F
+                {{  convertTemperature(temp, preferences.temp) }}{{toAbbreviation(preferences.temp)}}
               </CardContent>
             </Card>
             <Card class="w-auto h-40 p-2">
@@ -109,7 +117,7 @@ const wind = ref<string>('wind-speed');
                 Dewpoint
               </CardTitle>
               <CardContent class="text-6xl mt-4">
-                {{ dewpoint }}°F
+                {{ dewpoint }}{{toAbbreviation(preferences.temp)}}
               </CardContent>
             </Card>
           </div>
@@ -154,8 +162,7 @@ const wind = ref<string>('wind-speed');
               </Select>
               <CardContent class="mt-5">
               <span class="text-5xl relative">
-                {{ rainfallMap.get(rainfall) }}
-                <span class="text-4xl absolute -ml-3">"</span>
+                {{ rainfallMap.get(rainfall) }} {{toAbbreviation(preferences.distance)}}
               </span>
               </CardContent>
             </CardHeader>
@@ -185,8 +192,13 @@ const wind = ref<string>('wind-speed');
                 </SelectContent>
               </Select>
             </CardHeader>
-            <CardContent>
-              <WindDirection :rerender="rerenderKey" :angle="windAngle" :speed="windMap.get(wind)?.toFixed(1)"/>
+            <CardContent class="flex items-center justify-center">
+              <ClientOnly>
+                <template #fallback>
+                  <Skeleton class="h-28 w-28 rounded-full" />
+                </template>
+                <WindDirection :angle="windAngle" :rerender="rerenderKey" :speed="windMap.get(wind).toFixed(1)"/>
+              </ClientOnly>
             </CardContent>
           </Card>
 
@@ -209,7 +221,7 @@ const wind = ref<string>('wind-speed');
                     Solar Radiation
                   </CardTitle>
                   <CardContent>
-                    {{ solarIntensity }} W/M²
+                    {{ solarIntensity }} {{toAbbreviation(preferences.power)}}
                   </CardContent>
                 </Card>
 
@@ -228,7 +240,7 @@ const wind = ref<string>('wind-speed');
                     Absolute
                   </CardTitle>
                   <CardContent>
-                    {{ baromAbs }} <span class="font-light text-sm italic">inHg</span>
+                    {{ convertPressure(baromAbs, preferences.pressure) }} <span class="font-light text-sm italic">{{toAbbreviation(preferences.pressure)}}</span>
                   </CardContent>
                 </Card>
                 <Card>
@@ -236,7 +248,7 @@ const wind = ref<string>('wind-speed');
                     Relative
                   </CardTitle>
                   <CardContent>
-                    {{ baromRel }} <span class="font-light text-sm italic">inHg</span>
+                    {{ convertPressure(baromRel, preferences.pressure) }} <span class="font-light text-sm italic">{{toAbbreviation(preferences.pressure)}}</span>
                   </CardContent>
                 </Card>
 

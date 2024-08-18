@@ -4,7 +4,6 @@ import {NavigationMenu, navigationMenuTriggerStyle} from "~/components/ui/naviga
 import {Icon} from "@iconify/vue";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "~/components/ui/dropdown-menu";
 import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "~/components/ui/sheet";
-import type {PreferenceData} from "~/lib/utils";
 import {toTypedSchema} from "@vee-validate/zod";
 import {z} from "zod";
 import {useForm} from "vee-validate";
@@ -22,6 +21,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {useToast} from "~/components/ui/toast";
+import useUserPrefs from "~/composables/useUserPrefs";
+
 
 const {preferences, loadPreferences, savePreferences, loading, error} = useUserPrefs()
 const colorMode = useColorMode()
@@ -45,6 +46,9 @@ const onSubmit = handleSubmit(values => {
   toast({
     title: 'Successfully updated your preferences!'
   });
+  reloadNuxtApp({
+    persistState: true,
+  })
 })
 
 </script>
@@ -246,7 +250,7 @@ const onSubmit = handleSubmit(values => {
                           Millimeters of Mercury
                         </SelectItem>
                         <SelectItem value="pounds_per_square_inch">
-                          Pounds per Sqaure Inch
+                          Pounds per Square Inch
                         </SelectItem>
                         <SelectItem value="pascals">
                           Pascals
@@ -254,7 +258,7 @@ const onSubmit = handleSubmit(values => {
                         <SelectItem value="kilopascals">
                           Kilopascals
                         </SelectItem>
-                        <SelectItem value="atmostpheres">
+                        <SelectItem value="atmospheres">
                           Atmospheres
                         </SelectItem>
                         <SelectItem value="bar">
@@ -280,7 +284,7 @@ const onSubmit = handleSubmit(values => {
                     </FormControl>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectLabel>Angle Mesure Units</SelectLabel>
+                        <SelectLabel>Angle Measure Units</SelectLabel>
                         <SelectItem value="radians">
                           Radians
                         </SelectItem>

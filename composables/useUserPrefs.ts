@@ -1,9 +1,15 @@
-import { ref } from 'vue'
+import {ref} from 'vue'
 import type {PreferenceData} from "~/lib/utils";
 
-
-export default function useUserPreferences() {
-    const preferences = ref<PreferenceData>({angle: "degrees", distance: "inches", power: "watt", pressure: "inches_of_mercury", speed: "miles_per_hour", temp: "fahrenheit"})
+export default function useUserPrefs(){
+    const preferences = ref<PreferenceData>({
+        angle: "degrees",
+        distance: "inches",
+        power: "watt",
+        pressure: "inches_of_mercury",
+        speed: "miles_per_hour",
+        temp: "fahrenheit"
+    })
     const loading = ref(false)
     const error = ref<string | null>(null)
 
@@ -27,7 +33,7 @@ export default function useUserPreferences() {
         error.value = null
 
         try {
-            preferences.value = { ...preferences.value, ...newPreferences }
+            preferences.value = {...preferences.value, ...newPreferences}
             localStorage.setItem('userPreferences', JSON.stringify(preferences.value))
         } catch (err) {
             error.value = (err as Error).message
