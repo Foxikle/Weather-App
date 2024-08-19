@@ -20,7 +20,7 @@ import {
 import {Progress} from "~/components/ui/progress";
 import useUserPrefs from "~/composables/useUserPrefs";
 
-const {data, status} = useFetch<WeatherApiResponse>('http://localhost:3000/api/v1/latest');
+const {data, status} = useFetch<WeatherApiResponse>('https://weather-api.foxikle.dev/api/v1/latest');
 const {preferences} = useUserPrefs()
 
 const tempIn = data.value?.tempinf ?? 0;

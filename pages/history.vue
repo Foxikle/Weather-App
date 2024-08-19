@@ -54,7 +54,7 @@ const start_date = ref<string>(today(getLocalTimeZone()).toDate(getLocalTimeZone
 const end_date = ref<string>(new Date().toISOString())
 
 
-const {data, status, error, refresh} = useFetch<WeatherApiResponse[]>('http://localhost:3000/api/v1/range', {
+const {data, status, error, refresh} = useFetch<WeatherApiResponse[]>('https://weather-api.foxikle.dev/api/v1/range', {
   query: {
     start_date,
     end_date

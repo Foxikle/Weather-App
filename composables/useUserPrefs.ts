@@ -2,14 +2,15 @@ import {ref} from 'vue'
 import type {PreferenceData} from "~/lib/utils";
 
 export default function useUserPrefs(){
-    const preferences = ref<PreferenceData>({
+    const DEFAULT = {
         angle: "degrees",
         distance: "inches",
         power: "watt",
         pressure: "inches_of_mercury",
         speed: "miles_per_hour",
         temp: "fahrenheit"
-    })
+    };
+    const preferences = ref<PreferenceData>(DEFAULT)
     const loading = ref(false)
     const error = ref<string | null>(null)
 
@@ -19,7 +20,7 @@ export default function useUserPrefs(){
 
         try {
             const storedPreferences = localStorage.getItem('userPreferences')
-            preferences.value = storedPreferences ? JSON.parse(storedPreferences) : {}
+            preferences.value = storedPreferences ? JSON.parse(storedPreferences) : DEFAULT
         } catch (err) {
             error.value = (err as Error).message
         } finally {
