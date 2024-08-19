@@ -66,12 +66,12 @@ const wind = ref<string>('wind-speed');
         <CardContent class="mt-8">
           <h1 class="font-semibold text-2xl">Inside</h1>
           <hr>
-          <div class="grid grid-cols-3 self-center gap-8 mt-4 ">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 self-center gap-8 mt-4 ">
             <Card class="w-auto h-40 p-2">
               <CardTitle class="m-1">
                 Temperature
               </CardTitle>
-              <CardContent class="text-6xl mt-4">
+              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
                 {{ convertTemperature(tempIn, preferences.temp) }}{{toAbbreviation(preferences.temp)}}
               </CardContent>
             </Card>
@@ -79,15 +79,15 @@ const wind = ref<string>('wind-speed');
               <CardTitle class="m-1">
                 Relative Humidity
               </CardTitle>
-              <CardContent class="text-6xl mt-4">
+              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
                 {{ humidityIn }}%
               </CardContent>
             </Card>
-            <Card class="w-auto h-40 p-2">
+            <Card class="w-auto h-40 p-2 md:col-span-2">
               <CardTitle class="m-1">
                 Dewpoint
               </CardTitle>
-              <CardContent class="text-6xl mt-4">
+              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
                 {{ dewpointIn }}{{toAbbreviation(preferences.temp)}}
               </CardContent>
             </Card>
@@ -95,12 +95,12 @@ const wind = ref<string>('wind-speed');
           <!--             Exterrior   -->
           <h1 class="font-semibold text-2xl mt-5">Outside</h1>
           <hr>
-          <div class="grid grid-cols-3 self-center gap-8 mt-4 ">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 self-center gap-8 mt-4 ">
             <Card class="w-auto h-40 p-2">
               <CardTitle class="m-1">
                 Temperature
               </CardTitle>
-              <CardContent class="text-6xl mt-4">
+              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
                 {{  convertTemperature(temp, preferences.temp) }}{{toAbbreviation(preferences.temp)}}
               </CardContent>
             </Card>
@@ -108,15 +108,15 @@ const wind = ref<string>('wind-speed');
               <CardTitle class="m-1">
                 Relative Humidity
               </CardTitle>
-              <CardContent class="text-6xl mt-4">
+              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
                 {{ humidity }}%
               </CardContent>
             </Card>
-            <Card class="w-auto h-40 p-2">
+            <Card class="w-auto h-40 p-2 md:col-span-2">
               <CardTitle class="m-1">
                 Dewpoint
               </CardTitle>
-              <CardContent class="text-6xl mt-4">
+              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
                 {{ dewpoint }}{{toAbbreviation(preferences.temp)}}
               </CardContent>
             </Card>
@@ -130,7 +130,7 @@ const wind = ref<string>('wind-speed');
       <Card class="m-3 p-6 w-full text-center">
         <CardTitle>Environment Properties</CardTitle>
         <CardDescription>Pressure, Rainfall, Light, and Wind.</CardDescription>
-        <CardContent class="mt-4 grid grid-cols-2 gap-8">
+        <CardContent class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Rainfall -->
           <Card class="w-full mx-3">
             <CardTitle class="mt-3">Rainfall</CardTitle>
@@ -161,7 +161,7 @@ const wind = ref<string>('wind-speed');
                 </SelectContent>
               </Select>
               <CardContent class="mt-5">
-              <span class="text-5xl relative">
+              <span class="text-4xl md:text-5xl relative">
                 {{ rainfallMap.get(rainfall) }} {{toAbbreviation(preferences.distance)}}
               </span>
               </CardContent>
@@ -207,7 +207,7 @@ const wind = ref<string>('wind-speed');
             <CardTitle class="mt-3">Light</CardTitle>
 
             <CardContent>
-              <div class="grid grid-cols-2 gap-4 mt-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                 <Card>
                   <CardTitle class="text-xl font-normal">
                     UV Index
@@ -234,7 +234,7 @@ const wind = ref<string>('wind-speed');
             <CardTitle class="mt-3">Barometric Pressure</CardTitle>
 
             <CardContent>
-              <div class="grid grid-cols-2 gap-4 mt-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                 <Card>
                   <CardTitle class="text-xl font-normal">
                     Absolute

@@ -210,7 +210,7 @@ function format(str: string) {
       <!--  Dewpoint chart -->
       <Card class="p-2 m-1">
         <CardTitle>Dewpoint ({{ format(preferences.temp) }})</CardTitle>
-        <CardContent>
+        <CardContent class="mx-0 px-0">
           <LineChart :categories="['Inside', 'Outside']" :data="dewpoint"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
@@ -224,7 +224,8 @@ function format(str: string) {
       <!--  Temperature chart -->
       <Card class="p-2 m-1">
         <CardTitle>Temperature ({{ format(preferences.temp) }})</CardTitle>
-        <CardContent>
+        <CardContent class="mx-0 px-0">
+
           <LineChart :categories="['Inside', 'Outside']" :data="temperature"
                      :y-formatter="(tick, i) => {
 
@@ -239,7 +240,8 @@ function format(str: string) {
       <!--  Relative Humidity chart -->
       <Card class="p-2 m-1">
         <CardTitle>Relative Humidity</CardTitle>
-        <CardContent>
+        <CardContent class="mx-0 px-0">
+
           <LineChart :categories="['Inside', 'Outside']" :data="humidity"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
@@ -253,7 +255,8 @@ function format(str: string) {
       <!--  UV Index chart -->
       <Card class="p-2 m-1">
         <CardTitle>Ultraviolet Index</CardTitle>
-        <CardContent>
+        <CardContent class="mx-0 px-0">
+
           <LineChart :categories="['Outside']" :data="uv"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
@@ -267,7 +270,8 @@ function format(str: string) {
       <!--  Solar Radiation chart -->
       <Card class="p-2 m-1">
         <CardTitle>Solar Radiation ({{ format(preferences.power) }})</CardTitle>
-        <CardContent>
+        <CardContent class="mx-0 px-0">
+
           <LineChart :categories="['Outside']" :data="solar"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
@@ -281,7 +285,8 @@ function format(str: string) {
       <!--  Barometric Pressure chart -->
       <Card class="p-2 m-1">
         <CardTitle>Barometric Pressure ({{ format(preferences.pressure) }})</CardTitle>
-        <CardContent>
+        <CardContent class="mx-0 px-0">
+
           <LineChart :categories="['Absolute', 'Relative']" :data="bp"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
@@ -295,7 +300,8 @@ function format(str: string) {
       <!--  Rainfall chart -->
       <Card class="p-2 m-1">
         <CardTitle>Rainfall ({{ format(preferences.distance) }})</CardTitle>
-        <CardContent>
+        <CardContent class="mx-0 px-0">
+
           <LineChart :categories="['Hourly', 'Daily', 'Weekly', 'Monthly']" :data="rain"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
@@ -309,7 +315,8 @@ function format(str: string) {
       <!--  Windspeed chart -->
       <Card class="p-2 m-1">
         <CardTitle>Wind Speed ({{ format(preferences.speed) }})</CardTitle>
-        <CardContent>
+        <CardContent class="mx-0 px-0">
+
           <LineChart :categories="['Wind', 'Gust', 'Max_Gust']" :data="wind"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
@@ -323,7 +330,7 @@ function format(str: string) {
       <!--  Battery Levels chart -->
       <Card class="p-2 m-1">
         <CardTitle>Batery Levels</CardTitle>
-        <CardContent>
+        <CardContent class="mx-0 px-0">
           <LineChart :categories="['Base', 'Sensor']" :data="battery"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
