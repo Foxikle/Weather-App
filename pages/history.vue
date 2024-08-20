@@ -167,6 +167,14 @@ function format(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).replaceAll("_", " ");
 }
 
+useServerSeoMeta({
+  title: 'Weather History',
+  ogTitle: 'Weather History',
+  description: `View the historic weather data collected by this website!`,
+  ogDescription: `View the historic weather data collected by this website!`,
+  author: 'Foxikle',
+  ogUrl: 'https://weather.foxikle.dev',
+});
 
 </script>
 

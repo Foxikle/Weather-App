@@ -53,6 +53,15 @@ windMap.set('max-gust', data.value?.maxdailygust ?? 0);
 const rainfall = ref<string>('hourly-rain');
 const wind = ref<string>('wind-speed');
 
+useServerSeoMeta({
+  title: 'Current Weather',
+  ogTitle: 'Current Weather',
+  description: `Foxikle's weather website! The current temperature is ${temp}°F. The current dewpoint is ${dewpoint}°F. The relative humidity is ${humidity}!`,
+  ogDescription: `Foxikle's weather website! The current temperature is ${temp}°F. The current dewpoint is ${dewpoint}°F. The relative humidity is ${humidity}!`,
+  author: 'Foxikle',
+  ogUrl: 'https://weather.foxikle.dev',
+});
+
 </script>
 
 <template>
