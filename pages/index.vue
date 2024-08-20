@@ -83,7 +83,7 @@ const wind = ref<string>('wind-speed');
                 {{ humidityIn }}%
               </CardContent>
             </Card>
-            <Card class="w-auto h-40 p-2 md:col-span-2">
+            <Card class="w-auto h-40 p-2 col-span-2 lg:col-span-1">
               <CardTitle class="m-1">
                 Dewpoint
               </CardTitle>
@@ -112,7 +112,7 @@ const wind = ref<string>('wind-speed');
                 {{ humidity }}%
               </CardContent>
             </Card>
-            <Card class="w-auto h-40 p-2 md:col-span-2">
+            <Card class="w-auto h-40 p-2 col-span-2 lg:col-span-1">
               <CardTitle class="m-1">
                 Dewpoint
               </CardTitle>
