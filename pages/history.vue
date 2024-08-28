@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 
 import {LineChart} from "~/components/ui/chart-line";
-import {DateFormatter, getLocalTimeZone, today} from "@internationalized/date";
+import {DateFormatter, getLocalTimeZone, parseAbsolute, parseDate, parseDateTime, today} from "@internationalized/date";
 import {RangeCalendar} from '@/components/ui/range-calendar'
 import {Button} from '@/components/ui/button'
 import useUserPrefs from "~/composables/useUserPrefs";
@@ -21,6 +21,14 @@ import {
 import {Popover, PopoverContent, PopoverTrigger} from "~/components/ui/popover";
 import {Icon} from "@iconify/vue";
 
+const {preferences, loading, savePreferences, onPreferencesChange} = useUserPrefs()
+
+
+onPreferencesChange(newPreferences => {
+  dateRange.value.start = parseAbsolute(newPreferences.start);
+  dateRange.value.end = parseAbsolute(newPreferences.end);
+});
+
 const df = new DateFormatter('en-US', {
   dateStyle: 'medium',
 })
@@ -36,8 +44,6 @@ const dateRange = ref({
   end: today(getLocalTimeZone()).add({days: 1}),
 }) as Ref<DateRange>
 
-const {preferences} = useUserPrefs()
-
 
 watch(dateRange, (newValue) => {
   start_date.value = newValue.start?.toDate(getLocalTimeZone()).toISOString() ?? new Date().toISOString();
@@ -48,6 +54,11 @@ watch(dateRange, (newValue) => {
   } else {
     console.log("Not refreshing")
   }
+
+  savePreferences({
+    start: start_date.value,
+    end: end_date.value,
+  });
 });
 
 const start_date = ref<string>(today(getLocalTimeZone()).toDate(getLocalTimeZone()).toISOString())

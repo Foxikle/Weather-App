@@ -1,5 +1,6 @@
 import {type ClassValue, clsx} from 'clsx'
 import {twMerge} from 'tailwind-merge'
+import type {CalendarDate} from "@internationalized/date";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -58,6 +59,8 @@ export interface PreferenceData {
     pressure: string
     angle: string
     power: string
+    start: string,
+    end: string
 }
 
 export interface WeatherApiResponse {

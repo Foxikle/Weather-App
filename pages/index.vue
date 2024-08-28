@@ -92,7 +92,7 @@ useServerSeoMeta({
                 {{ humidityIn }}%
               </CardContent>
             </Card>
-            <Card class="w-auto h-40 p-2 col-span-2 lg:col-span-1">
+            <Card class="w-auto h-40 p-2 md:col-span-2 lg:col-span-1">
               <CardTitle class="m-1">
                 Dewpoint
               </CardTitle>
@@ -121,7 +121,7 @@ useServerSeoMeta({
                 {{ humidity }}%
               </CardContent>
             </Card>
-            <Card class="w-auto h-40 p-2 col-span-2 lg:col-span-1">
+            <Card class="w-auto h-40 p-2 md:col-span-2 lg:col-span-1">
               <CardTitle class="m-1">
                 Dewpoint
               </CardTitle>
