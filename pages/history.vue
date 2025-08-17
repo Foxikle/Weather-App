@@ -27,6 +27,7 @@ const {preferences, loading, savePreferences, onPreferencesChange} = useUserPref
 onPreferencesChange(newPreferences => {
   dateRange.value.start = parseAbsolute(newPreferences.start);
   dateRange.value.end = parseAbsolute(newPreferences.end);
+  refresh()
 });
 
 const df = new DateFormatter('en-US', {
@@ -61,8 +62,11 @@ watch(dateRange, (newValue) => {
   });
 });
 
-const start_date = ref<string>(today(getLocalTimeZone()).toDate(getLocalTimeZone()).toISOString())
-const end_date = ref<string>(new Date().toISOString())
+console.log(preferences.value.end)
+console.log(preferences.value.start)
+
+const start_date = ref<string>(preferences.value.start ?? today(getLocalTimeZone()).toDate(getLocalTimeZone()).toISOString())
+const end_date = ref<string>(preferences.value.end ?? new Date().toISOString())
 
 
 const {data, status, error, refresh} = useFetch<WeatherApiResponse[]>('https://weather-api.foxikle.dev/api/v1/range', {
@@ -348,7 +352,7 @@ useServerSeoMeta({
 
       <!--  Battery Levels chart -->
       <Card class="p-2 m-1">
-        <CardTitle>Batery Levels</CardTitle>
+        <CardTitle>Battery Levels</CardTitle>
         <CardContent class="mx-0 px-0">
           <LineChart :categories="['Base', 'Sensor']" :data="battery"
                      :y-formatter="(tick, i) => {

@@ -24,6 +24,8 @@ export function calculateDewPoint(temp: number, unit: string, humidity: number):
     const alpha = (a * tempCelsius) / (b + tempCelsius) + Math.log(humidity / 100);
     const dewPointCelsius = (b * alpha) / (a - alpha);
 
+    console.log("Temp: " + temp + " |  Humidity: " + humidity + "%| Dew Point: " + dewPointCelsius + " Celsius, Unit: " + unit)
+
     // Convert the dew point to the desired output unit
     let returnme = 0;
     switch (unit) {

@@ -20,7 +20,26 @@ import {
 import {Progress} from "~/components/ui/progress";
 import useUserPrefs from "~/composables/useUserPrefs";
 
-const {data, status} = useFetch<WeatherApiResponse>('https://weather-api.foxikle.dev/api/v1/latest');
+const {data, status, error} = useFetch<WeatherApiResponse>('https://weather-api.foxikle.dev/api/v1/latest');
+
+const refreshedData = ref<WeatherApiResponse | null>(data);
+const refreshError = ref<string> (error);
+const refreshStatus = ref<'idle' | 'loading' | 'success' | 'error'>(status);
+
+onMounted(async () => {
+  refreshStatus.value = 'loading';
+  try {
+    const response = await fetch('https://weather-api.foxikle.dev/api/v1/latest');
+    if (!response.ok) throw new Error('Failed to fetch data: ' + response.body);
+    refreshedData.value = await response.json();
+    refreshStatus.value = 'success';
+  } catch (err) {
+    refreshError.value = err;
+    console.error(err);
+    refreshStatus.value = 'error';
+  }
+});
+
 const {preferences} = useUserPrefs()
 
 const tempIn = data.value?.tempinf ?? 0;
@@ -65,6 +84,9 @@ useServerSeoMeta({
 </script>
 
 <template>
+  <h1 v-if="(status === 'error') || (refreshStatus === 'error')">
+    ERROR: {{  }}
+  </h1>
   <h1 class="text-5xl text-center m-6"> Current Weather </h1>
 
   <div v-if="status === 'success'">
