@@ -1,15 +1,37 @@
-import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import {type ClassValue, clsx} from 'clsx'
+import {twMerge} from 'tailwind-merge'
 
 /**
  * Strong unit types for user preferences and converters.
  */
 export type TemperatureUnit = 'fahrenheit' | 'celsius' | 'kelvin' | 'rankine'
 export type DistanceUnit = 'inches' | 'meters' | 'miles' | 'millimeters' | 'centimeters' | 'furlongs' | 'rods'
-export type SpeedUnit = 'miles_per_hour' | 'feet_per_minute' | 'feet_per_second' | 'kilometers_per_hour' | 'meters_per_minute' | 'meters_per_second' | 'furlongs_per_fortnight'
-export type PressureUnit = 'inches_of_mercury' | 'millimeters_of_mercury' | 'pounds_per_square_inch' | 'pascals' | 'kilopascals' | 'atmospheres' | 'bar' | 'torr'
+export type SpeedUnit =
+    'miles_per_hour'
+    | 'feet_per_minute'
+    | 'feet_per_second'
+    | 'kilometers_per_hour'
+    | 'meters_per_minute'
+    | 'meters_per_second'
+    | 'furlongs_per_fortnight'
+export type PressureUnit =
+    'inches_of_mercury'
+    | 'millimeters_of_mercury'
+    | 'pounds_per_square_inch'
+    | 'pascals'
+    | 'kilopascals'
+    | 'atmospheres'
+    | 'bar'
+    | 'torr'
 export type AngleUnit = 'degrees' | 'radians'
-export type PowerUnit = 'watt' | 'horsepower' | 'calories_per_second' | 'btu_per_hr' | 'decibel_milliwatts' | 'megawatts' | 'kilowatts'
+export type PowerUnit =
+    'watt'
+    | 'horsepower'
+    | 'calories_per_second'
+    | 'btu_per_hr'
+    | 'decibel_milliwatts'
+    | 'megawatts'
+    | 'kilowatts'
 
 export function cn(...inputs: ClassValue[]): string {
     return twMerge(clsx(...inputs))
@@ -74,6 +96,33 @@ export interface PreferenceData {
 }
 
 export interface WeatherApiResponse {
+    stationtype: string
+    PASSKEY: string
+    dateutc: string
+    tempf: number
+    humidity: number
+    windspeedmph: number
+    windgustmph: number
+    maxdailygust: number
+    winddir: number
+    uv: number
+    solarradiation: number
+    hourlyrainin: number
+    dailyrainin: number
+    weeklyrainin: number
+    monthlyrainin: number
+    totalrainin: number
+    battout: number
+    tempinf: number
+    humidityin: number
+    baromrelin: number
+    baromabsin: number
+    batt_co2: number
+    created_at: string
+    updated_at: string
+}
+
+export interface WeatherRangeApiResponse {
     start: string
     end: string
     datetime: string

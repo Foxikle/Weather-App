@@ -18,7 +18,7 @@ import {
   convertSpeed,
   convertTemperature,
   toAbbreviation,
-  type WeatherApiResponse
+   type WeatherRangeApiResponse
 } from "~/lib/utils";
 import {Popover, PopoverContent, PopoverTrigger} from "~/components/ui/popover";
 import {Icon} from "@iconify/vue";
@@ -74,7 +74,7 @@ console.log(preferences.value.end)
 console.log(preferences.value.start)
 
 
-const {data, status, error, refresh} = useFetch<WeatherApiResponse[]>('https://weather-api.foxikle.dev/api/v2/range', {
+const {data, status, error, refresh} = useFetch<WeatherRangeApiResponse[]>('https://weather-api.foxikle.dev/api/v2/range', {
   query: {
     start_date,
     end_date,
