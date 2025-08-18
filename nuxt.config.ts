@@ -1,26 +1,32 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-export default defineNuxtConfig({
-  devtools: {
-    enabled: true,
+import tailwindcss from "@tailwindcss/vite";
 
-    timeline: {
-      enabled: true,
+export default defineNuxtConfig({
+    devtools: {
+        enabled: true,
+
+        timeline: {
+            enabled: true,
+        },
     },
-  },
-  modules: ["@nuxtjs/tailwindcss", "shadcn-nuxt", '@nuxtjs/color-mode', 'nuxt-highcharts'],
-  shadcn: {
-    /**
-     * Prefix for all the imported component
-     */
-    prefix: '',
-    /**
-     * Directory that the component lives in.
-     * @default "./components/ui"
-     */
-    componentDir: './components/ui'
-  },
-  colorMode: {
-    classSuffix: ''
-  },
-  compatibilityDate: "2024-07-03",
+    modules: ["shadcn-nuxt", '@nuxtjs/color-mode', 'nuxt-highcharts'],
+    shadcn: {
+        /**
+         * Prefix for all the imported component
+         */
+        prefix: '',
+        /**
+         * Directory that the component lives in.
+         * @default "./components/ui"
+         */
+        componentDir: './components/ui'
+    },
+    colorMode: {
+        classSuffix: ''
+    },
+    css: ['~/assets/css/tailwind.css'],
+    vite: {
+        plugins: [tailwindcss()],
+    },
+    compatibilityDate: "2024-07-03",
 })
