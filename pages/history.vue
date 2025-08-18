@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 
+definePageMeta({ ssr: false })
+
 import {LineChart} from "~/components/ui/chart-line";
 import {DateFormatter, getLocalTimeZone, parseAbsolute, parseDate, parseDateTime, today} from "@internationalized/date";
 import {RangeCalendar} from '@/components/ui/range-calendar'
 import {Button} from '@/components/ui/button'
 import useUserPrefs from "~/composables/useUserPrefs";
 import type {DateRange} from "radix-vue";
-import {ref, type Ref} from "vue";
+import {ref, type Ref, watch, computed} from "vue";
 import {
   calculateDewPoint,
   cn,

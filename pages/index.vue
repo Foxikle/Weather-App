@@ -20,11 +20,11 @@ import {
 import {Progress} from "~/components/ui/progress";
 import useUserPrefs from "~/composables/useUserPrefs";
 
-const {data, status, error} = useFetch<WeatherApiResponse>('https://weather-api.foxikle.dev/api/v1/latest');
+const { data, status, error } = useFetch<WeatherApiResponse>('https://weather-api.foxikle.dev/api/v1/latest');
 
-const refreshedData = ref<WeatherApiResponse | null>(data);
-const refreshError = ref<string> (error);
-const refreshStatus = ref<'idle' | 'loading' | 'success' | 'error'>(status);
+const refreshedData = ref<WeatherApiResponse | null>(data.value ?? null);
+const refreshError = ref<string | null>(error.value ? String(error.value) : null);
+const refreshStatus = ref<'idle' | 'loading' | 'success' | 'error'>('idle');
 
 onMounted(async () => {
   refreshStatus.value = 'loading';
@@ -46,8 +46,8 @@ const tempIn = data.value?.tempinf ?? 0;
 const humidityIn = data.value?.humidityin ?? 0;
 const temp = data.value?.tempf ?? 0;
 const humidity = data.value?.humidity ?? 0;
-const dewpointIn = calculateDewPoint(tempIn, preferences.value.temp, humidityIn);
-const dewpoint = calculateDewPoint(temp, preferences.value.temp, humidity);
+const dewpointIn = computed(() => calculateDewPoint(tempIn, preferences.value.temp, humidityIn));
+const dewpoint = computed(() => calculateDewPoint(temp, preferences.value.temp, humidity));
 const windAngle = ref<number>(data.value?.winddir ?? 0);
 const uv = data.value?.uv ?? 0;
 const solarIntensity = data.value?.solarradiation ?? 0;
@@ -75,8 +75,8 @@ const wind = ref<string>('wind-speed');
 useServerSeoMeta({
   title: 'Current Weather',
   ogTitle: 'Current Weather',
-  description: `Foxikle's weather website! The current temperature is ${temp}°F. The current dewpoint is ${dewpoint}°F. The relative humidity is ${humidity}!`,
-  ogDescription: `Foxikle's weather website! The current temperature is ${temp}°F. The current dewpoint is ${dewpoint}°F. The relative humidity is ${humidity}!`,
+  description: `Foxikle's weather website! The current temperature is ${temp}°F. The current dewpoint is ${dewpoint.value}°F. The relative humidity is ${humidity}!`,
+  ogDescription: `Foxikle's weather website! The current temperature is ${temp}°F. The current dewpoint is ${dewpoint.value}°F. The relative humidity is ${humidity}!`,
   author: 'Foxikle',
   ogUrl: 'https://weather.foxikle.dev',
 });

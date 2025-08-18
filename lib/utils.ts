@@ -1,9 +1,18 @@
-import {type ClassValue, clsx} from 'clsx'
-import {twMerge} from 'tailwind-merge'
-import type {CalendarDate} from "@internationalized/date";
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
-export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs))
+/**
+ * Strong unit types for user preferences and converters.
+ */
+export type TemperatureUnit = 'fahrenheit' | 'celsius' | 'kelvin' | 'rankine'
+export type DistanceUnit = 'inches' | 'meters' | 'miles' | 'millimeters' | 'centimeters' | 'furlongs' | 'rods'
+export type SpeedUnit = 'miles_per_hour' | 'feet_per_minute' | 'feet_per_second' | 'kilometers_per_hour' | 'meters_per_minute' | 'meters_per_second' | 'furlongs_per_fortnight'
+export type PressureUnit = 'inches_of_mercury' | 'millimeters_of_mercury' | 'pounds_per_square_inch' | 'pascals' | 'kilopascals' | 'atmospheres' | 'bar' | 'torr'
+export type AngleUnit = 'degrees' | 'radians'
+export type PowerUnit = 'watt' | 'horsepower' | 'calories_per_second' | 'btu_per_hr' | 'decibel_milliwatts' | 'megawatts' | 'kilowatts'
+
+export function cn(...inputs: ClassValue[]): string {
+    return twMerge(clsx(...inputs))
 }
 
 /**
@@ -12,7 +21,7 @@ export function cn(...inputs: ClassValue[]) {
  * @param unit The unit to export
  * @param humidity The relative humidity, as a number. (ie 67% would be 67)
  */
-export function calculateDewPoint(temp: number, unit: string, humidity: number): number {
+export function calculateDewPoint(temp: number, unit: TemperatureUnit, humidity: number): number {
     // Convert the input temperature from Fahrenheit to Celsius
     const tempCelsius = (temp - 32) * 5 / 9;
 
@@ -23,8 +32,6 @@ export function calculateDewPoint(temp: number, unit: string, humidity: number):
     // Calculate the dew point in Celsius using the Magnus formula
     const alpha = (a * tempCelsius) / (b + tempCelsius) + Math.log(humidity / 100);
     const dewPointCelsius = (b * alpha) / (a - alpha);
-
-    console.log("Temp: " + temp + " |  Humidity: " + humidity + "%| Dew Point: " + dewPointCelsius + " Celsius, Unit: " + unit)
 
     // Convert the dew point to the desired output unit
     let returnme = 0;
@@ -55,12 +62,12 @@ export function getUVIndex(value: number): string {
 }
 
 export interface PreferenceData {
-    temp: string
-    distance: string
-    speed: string
-    pressure: string
-    angle: string
-    power: string
+    temp: TemperatureUnit
+    distance: DistanceUnit
+    speed: SpeedUnit
+    pressure: PressureUnit
+    angle: AngleUnit
+    power: PowerUnit
     start: string,
     end: string
 }
@@ -97,7 +104,7 @@ export interface WeatherApiResponse {
  * @param fahrenheit The temperature in FAHRENHEIT!
  * @param unit the unit to translate to
  */
-export function convertTemperature(fahrenheit: number, unit: string): number {
+export function convertTemperature(fahrenheit: number, unit: TemperatureUnit): number {
     let returnme = 0;
     if (unit === 'celsius') {
         returnme = (fahrenheit - 32) * 5 / 9;
@@ -110,8 +117,8 @@ export function convertTemperature(fahrenheit: number, unit: string): number {
     return parseFloat(returnme.toFixed(1));
 }
 
-export function convertDistance(inches: number, unit: string): number {
-    const conversionFactors: { [key: string]: number } = {
+export function convertDistance(inches: number, unit: DistanceUnit): number {
+    const conversionFactors: { [key in Exclude<DistanceUnit, 'inches'>]?: number } = {
         meters: 0.0254,
         miles: 1.5783e-5,
         millimeters: 25.4,
@@ -120,15 +127,15 @@ export function convertDistance(inches: number, unit: string): number {
         rods: 0.00505
     };
 
-    if (!conversionFactors.hasOwnProperty(unit)) {
+    if (!(unit in conversionFactors)) {
         return parseFloat(inches.toFixed(2));
     }
 
-    return parseFloat((inches * conversionFactors[unit]).toFixed(2));
+    return parseFloat((inches * (conversionFactors[unit as Exclude<DistanceUnit, 'inches'>] ?? 1)).toFixed(2));
 }
 
-export function convertSpeed(mph: number, unit: string): number {
-    const conversionFactors: { [key: string]: number } = {
+export function convertSpeed(mph: number, unit: SpeedUnit): number {
+    const conversionFactors: { [key in Exclude<SpeedUnit, 'miles_per_hour'>]?: number } = {
         feet_per_minute: 88,
         feet_per_second: 1.46667,
         kilometers_per_hour: 1.60934,
@@ -137,15 +144,15 @@ export function convertSpeed(mph: number, unit: string): number {
         furlongs_per_fortnight: 2688
     };
 
-    if (!conversionFactors.hasOwnProperty(unit)) {
+    if (!(unit in conversionFactors)) {
         return parseFloat(mph.toFixed(1));
     }
 
-    return parseFloat((mph * conversionFactors[unit]).toFixed(1));
+    return parseFloat((mph * (conversionFactors[unit as Exclude<SpeedUnit, 'miles_per_hour'>] ?? 1)).toFixed(1));
 }
 
-export function convertPressure(inHg: number, unit: string): number {
-    const conversionFactors: { [key: string]: number } = {
+export function convertPressure(inHg: number, unit: PressureUnit): number {
+    const conversionFactors: { [key in Exclude<PressureUnit, 'inches_of_mercury'>]?: number } = {
         millimeters_of_mercury: 25.4,
         pounds_per_square_inch: 0.491154,
         pascals: 3386.39,
@@ -155,24 +162,23 @@ export function convertPressure(inHg: number, unit: string): number {
         torr: 25.4
     };
 
-    if (!conversionFactors.hasOwnProperty(unit)) {
+    if (!(unit in conversionFactors)) {
         return parseFloat(inHg.toFixed(2));
     }
 
-    return parseFloat((inHg * conversionFactors[unit]).toFixed(1));
+    return parseFloat((inHg * (conversionFactors[unit as Exclude<PressureUnit, 'inches_of_mercury'>] ?? 1)).toFixed(1));
 }
 
-export function convertAngle(deg: number | undefined, unit: string): number {
-    if (deg) {
-        if (unit === 'radians') {
-            return parseFloat((deg * (Math.PI / 180)).toFixed(5));
-        }
-        return parseFloat(deg.toFixed(1));
-    } else return 0;
+export function convertAngle(deg: number | undefined, unit: AngleUnit): number {
+    if (deg === undefined) return 0;
+    if (unit === 'radians') {
+        return parseFloat((deg * (Math.PI / 180)).toFixed(5));
+    }
+    return parseFloat(deg.toFixed(1));
 }
 
-export function convertPower(wattsPerSquareMeter: number, unit: string): number {
-    const conversionFactors: { [key: string]: number } = {
+export function convertPower(wattsPerSquareMeter: number, unit: PowerUnit): number {
+    const conversionFactors: { [key in Exclude<PowerUnit, 'watt'>]?: number } = {
         horsepower: 0.00134102,
         calories_per_second: 0.2388459,
         btu_per_hr: 3.412142,
@@ -181,20 +187,22 @@ export function convertPower(wattsPerSquareMeter: number, unit: string): number 
         kilowatts: 0.001
     };
 
-    if (!conversionFactors.hasOwnProperty(unit)) {
+    if (!(unit in conversionFactors)) {
         return parseFloat(wattsPerSquareMeter.toFixed(2));
     }
 
-    return parseFloat((wattsPerSquareMeter * conversionFactors[unit]).toFixed(2));
+    return parseFloat((wattsPerSquareMeter * (conversionFactors[unit as Exclude<PowerUnit, 'watt'>] ?? 1)).toFixed(2));
 }
 
-export function toAbbreviation(str: string): string {
+export type UnitKey = TemperatureUnit | DistanceUnit | SpeedUnit | PressureUnit | AngleUnit | PowerUnit
+
+export function toAbbreviation(str: UnitKey): string {
     switch (str) {
         case 'horsepower':
             return 'hp';
         case 'calories_per_second':
             return 'cal/s';
-        case 'btu_per_hour':
+        case 'btu_per_hr':
             return 'btu/hr';
         case 'decibel_milliwatts':
             return 'dBm';

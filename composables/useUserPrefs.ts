@@ -1,6 +1,6 @@
-import {ref} from 'vue'
-import type {PreferenceData} from "~/lib/utils";
-import {CalendarDate, getLocalTimeZone, today} from "@internationalized/date";
+import { ref, onMounted, watch } from 'vue'
+import type { PreferenceData } from "~/lib/utils";
+import { getLocalTimeZone, today } from "@internationalized/date";
 
 export default function useUserPrefs(){
     const DEFAULT: PreferenceData = {
@@ -13,19 +13,38 @@ export default function useUserPrefs(){
         start: today(getLocalTimeZone()).toDate(getLocalTimeZone()).toISOString(),
         end: today(getLocalTimeZone()).add({days: 1}).toDate(getLocalTimeZone()).toISOString(),
     };
+
+    const STORAGE_KEY = 'weather:prefs:v1'
+    const LEGACY_KEY = 'userPreferences'
+
     const preferences = ref<PreferenceData>(DEFAULT)
     const loading = ref(false)
     const error = ref<string | null>(null)
 
+    const safeMerge = (raw: any): PreferenceData => {
+        // Merge with defaults to ensure all fields exist and types are sane
+        const merged = { ...DEFAULT, ...(typeof raw === 'object' && raw ? raw : {}) }
+        return merged
+    }
+
     const loadPreferences = () => {
+        if (!process.client) return
         loading.value = true
         error.value = null
 
         try {
-            const storedPreferences = localStorage.getItem('userPreferences')
-            preferences.value = storedPreferences ? JSON.parse(storedPreferences) : DEFAULT
+            // Migrate from legacy key if present
+            const legacy = localStorage.getItem(LEGACY_KEY)
+            if (legacy && !localStorage.getItem(STORAGE_KEY)) {
+                localStorage.setItem(STORAGE_KEY, legacy)
+                localStorage.removeItem(LEGACY_KEY)
+            }
+
+            const stored = localStorage.getItem(STORAGE_KEY)
+            preferences.value = stored ? safeMerge(JSON.parse(stored)) : DEFAULT
         } catch (err) {
             error.value = (err as Error).message
+            preferences.value = DEFAULT
         } finally {
             loading.value = false
         }
@@ -35,13 +54,22 @@ export default function useUserPrefs(){
         loadPreferences();
     })
 
-    const savePreferences = (newPreferences: any) => {
+    const persist = () => {
+        if (!process.client) return
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences.value))
+        } catch (err) {
+            error.value = (err as Error).message
+        }
+    }
+
+    const savePreferences = (newPreferences: Partial<PreferenceData>) => {
         loading.value = true
         error.value = null
 
         try {
-            preferences.value = {...preferences.value, ...newPreferences}
-            localStorage.setItem('userPreferences', JSON.stringify(preferences.value))
+            preferences.value = safeMerge({ ...preferences.value, ...newPreferences })
+            persist()
         } catch (err) {
             error.value = (err as Error).message
         } finally {
@@ -51,7 +79,6 @@ export default function useUserPrefs(){
 
     const onPreferencesChange = (callback: (newPreferences: PreferenceData) => void) => {
         watch(preferences, (newVals) => {
-
             const updatedPreferences: PreferenceData = {
                 temp: newVals.temp,
                 distance: newVals.distance,
@@ -62,8 +89,10 @@ export default function useUserPrefs(){
                 start: newVals.start,
                 end: newVals.end,
             };
-
-            callback(updatedPreferences);        }, { deep: true });
+            callback(updatedPreferences)
+            // Also persist on any change to keep storage in sync
+            persist()
+        }, { deep: true });
     };
 
     return {
