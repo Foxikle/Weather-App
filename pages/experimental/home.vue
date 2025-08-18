@@ -39,6 +39,7 @@ onMounted(async () => {
 const { preferences } = useUserPrefs()
 
 const now = computed(() => new Date())
+const created = computed(() => new Date(fresh.value?.created_at ?? data.value?.created_at ?? now.value.toISOString()))
 const tempOut = computed(() => fresh.value?.tempf ?? data.value?.tempf ?? 0)
 const tempIn = computed(() => fresh.value?.tempinf ?? data.value?.tempinf ?? 0)
 const rhOut = computed(() => fresh.value?.humidity ?? data.value?.humidity ?? 0)
@@ -70,7 +71,16 @@ useServerSeoMeta({
           <div>
             <CardTitle class="text-3xl md:text-4xl">Current Conditions</CardTitle>
             <CardDescription>
-              Updated <span class="font-medium">{{ now.toLocaleString() }}</span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    Updated <span class="font-medium">{{ now.toLocaleString() }}</span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Snapshot timestamp: <span class="font-medium">{{ created.toLocaleString() }}</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <span v-if="refreshState === 'error'" class="text-destructive ml-2">(live refresh failed)</span>
             </CardDescription>
           </div>
