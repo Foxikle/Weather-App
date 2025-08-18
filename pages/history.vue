@@ -275,12 +275,12 @@ useServerSeoMeta({
         </CardContent>
       </Card>
 
-      <!--  UV Index chart -->
+      <!--  Barometric Pressure chart -->
       <Card class="p-2 m-1">
-        <CardTitle>Ultraviolet Index</CardTitle>
+        <CardTitle>Barometric Pressure ({{ format(preferences.pressure) }})</CardTitle>
         <CardContent class="mx-0 px-0">
 
-          <LineChart :categories="['Outside']" :data="uv"
+          <LineChart :categories="['Absolute', 'Relative']" :data="bp"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
         ? ` ${new Intl.NumberFormat('us').format(tick).toString()}`
@@ -305,12 +305,12 @@ useServerSeoMeta({
         </CardContent>
       </Card>
 
-      <!--  Barometric Pressure chart -->
+      <!--  UV Index chart -->
       <Card class="p-2 m-1">
-        <CardTitle>Barometric Pressure ({{ format(preferences.pressure) }})</CardTitle>
+        <CardTitle>Ultraviolet Index</CardTitle>
         <CardContent class="mx-0 px-0">
 
-          <LineChart :categories="['Absolute', 'Relative']" :data="bp"
+          <LineChart :categories="['Outside']" :data="uv"
                      :y-formatter="(tick, i) => {
     return typeof tick === 'number'
         ? ` ${new Intl.NumberFormat('us').format(tick).toString()}`
