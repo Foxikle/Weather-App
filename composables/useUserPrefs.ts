@@ -1,8 +1,7 @@
 import { ref, onMounted, watch } from 'vue'
 import type { PreferenceData } from "~/lib/utils";
-import { getLocalTimeZone, today } from "@internationalized/date";
-
 export default function useUserPrefs(){
+    const now = new Date();
     const DEFAULT: PreferenceData = {
         angle: "degrees",
         distance: "inches",
@@ -10,8 +9,9 @@ export default function useUserPrefs(){
         pressure: "inches_of_mercury",
         speed: "miles_per_hour",
         temp: "fahrenheit",
-        start: today(getLocalTimeZone()).toDate(getLocalTimeZone()).toISOString(),
-        end: today(getLocalTimeZone()).add({days: 1}).toDate(getLocalTimeZone()).toISOString(),
+        // Default to the past 24 hours
+        start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+        end: now.toISOString(),
     };
 
     const STORAGE_KEY = 'weather:prefs:v1'

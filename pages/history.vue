@@ -3,7 +3,7 @@
 definePageMeta({ ssr: false })
 
 import {LineChart} from "~/components/ui/chart-line";
-import {DateFormatter, getLocalTimeZone, parseAbsolute, parseDate, parseDateTime, today} from "@internationalized/date";
+import {DateFormatter, getLocalTimeZone, parseAbsolute} from "@internationalized/date";
 import {RangeCalendar} from '@/components/ui/range-calendar'
 import {Button} from '@/components/ui/button'
 import useUserPrefs from "~/composables/useUserPrefs";
@@ -43,8 +43,8 @@ const datetimeFormatter = new DateFormatter('en-US', {
 })
 
 const dateRange = ref({
-  start: today(getLocalTimeZone()),
-  end: today(getLocalTimeZone()).add({days: 1}),
+  start: parseAbsolute(preferences.value.start),
+  end: parseAbsolute(preferences.value.end),
 }) as Ref<DateRange>
 
 
@@ -67,8 +67,10 @@ watch(dateRange, (newValue) => {
 console.log(preferences.value.end)
 console.log(preferences.value.start)
 
-const start_date = ref<string>(preferences.value.start ?? today(getLocalTimeZone()).toDate(getLocalTimeZone()).toISOString())
-const end_date = ref<string>(preferences.value.end ?? new Date().toISOString())
+const __now = new Date();
+const __last24 = new Date(__now.getTime() - 24 * 60 * 60 * 1000);
+const start_date = ref<string>(preferences.value.start ?? __last24.toISOString())
+const end_date = ref<string>(preferences.value.end ?? __now.toISOString())
 
 
 const {data, status, error, refresh} = useFetch<WeatherApiResponse[]>('https://weather-api.foxikle.dev/api/v1/range', {
