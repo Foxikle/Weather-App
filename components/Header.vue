@@ -23,7 +23,7 @@ import {
 import {useToast} from "~/components/ui/toast";
 import useUserPrefs from "~/composables/useUserPrefs";
 import { Input } from "@/components/ui/input"
-
+import { Switch } from "@/components/ui/switch"
 
 
 const {preferences, loadPreferences, savePreferences, loading, error} = useUserPrefs()
@@ -338,6 +338,16 @@ const onSubmit = handleSubmit(values => {
                   </Select>
                 </FormItem>
               </FormField>
+
+              <h1 class="mt-3 mb-1">Experimental</h1>
+
+              <div class="flex items-center justify-between py-2">
+                <div>
+                  <Label for="experimental-ui">Experimental UI</Label>
+                  <p class="text-sm text-muted-foreground">Redirect Home and History to staged pages</p>
+                </div>
+                <Switch id="experimental-ui" :checked="preferences.experimentalUI === true" @update:checked="(v:boolean) => savePreferences({ experimentalUI: v })" />
+              </div>
 
               <h1 class="mt-3 mb-1">Data Fetching</h1>
 

@@ -93,6 +93,7 @@ export interface PreferenceData {
     start: string,
     end: string,
     segments: number
+    experimentalUI?: boolean
 }
 
 export interface WeatherApiResponse {

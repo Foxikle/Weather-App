@@ -14,6 +14,7 @@ export default function useUserPrefs(){
         start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
         end: now.toISOString(),
         segments: 100,
+        experimentalUI: false,
     };
 
     const STORAGE_KEY = 'weather:prefs:v1'
@@ -89,6 +90,7 @@ export default function useUserPrefs(){
                 start: newVals.start,
                 end: newVals.end,
                 segments: newVals.segments,
+                experimentalUI: newVals.experimentalUI,
             };
             callback(updatedPreferences)
             // Also persist on any change to keep storage in sync

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Header from '@/components/Header.vue'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Progress } from '@/components/ui/progress'
-import useUserPrefs from '@/composables/useUserPrefs'
+import Header from '~/components/Header.vue'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
+import { Skeleton } from '~/components/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
+import { Progress } from '~/components/ui/progress'
+import useUserPrefs from '~/composables/useUserPrefs'
 import {
   calculateDewPoint,
   convertPressure,
@@ -13,7 +13,7 @@ import {
   getUVIndex,
   toAbbreviation,
   type WeatherApiResponse,
-} from '@/lib/utils'
+} from '~/lib/utils'
 
 // Fetch latest weather snapshot
 const { data, status, error } = useFetch<WeatherApiResponse>('https://weather-api.foxikle.dev/api/v1/latest')
@@ -91,7 +91,7 @@ useServerSeoMeta({
             <Card>
               <CardHeader>
                 <CardDescription>Outside</CardDescription>
-                <CardTitle class="text-5xl">
+                <CardTitle class="text-4xl">
                   {{ convertTemperature(tempOut, preferences.temp) }}{{ toAbbreviation(preferences.temp) }}
                 </CardTitle>
               </CardHeader>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { RangeCalendar } from '@/components/ui/range-calendar'
-import useUserPrefs from '@/composables/useUserPrefs'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
+import { Button } from '~/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover'
+import { RangeCalendar } from '~/components/ui/range-calendar'
+import useUserPrefs from '~/composables/useUserPrefs'
 import { DateFormatter, getLocalTimeZone, parseAbsolute } from '@internationalized/date'
 import type { DateRange } from 'radix-vue'
 import {
@@ -15,7 +15,7 @@ import {
   convertTemperature,
   toAbbreviation,
   type WeatherRangeApiResponse,
-} from '@/lib/utils'
+} from '~/lib/utils'
 import { useColorMode } from '#imports'
 
 // Page is CSR to simplify chart deps rendering
