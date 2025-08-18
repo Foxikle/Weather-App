@@ -21,6 +21,7 @@
     "@unovis/vue": "^1.4.4",
     "@vee-validate/zod": "^4.13.1",
     "@vueuse/core": "^10.11.0",
+    "apexcharts": "^5.3.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.400.0",
@@ -30,9 +31,11 @@
     "shadcn-nuxt": "^0.10.4",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
+    "tw-animate-css": "^1.3.7",
     "typescript": "^5.5.3",
     "vee-validate": "^4.13.1",
     "vue": "latest",
+    "vue3-apexcharts": "^1.8.0",
     "zod": "^3.23.8"
   }
 }

@@ -1,5 +1,6 @@
-import { ref, onMounted, watch } from 'vue'
-import type { PreferenceData } from "~/lib/utils";
+import {onMounted, ref, watch} from 'vue'
+import type {PreferenceData} from "~/lib/utils";
+
 export default function useUserPrefs(){
     const now = new Date();
     const DEFAULT: PreferenceData = {
@@ -12,6 +13,7 @@ export default function useUserPrefs(){
         // Default to the past 24 hours
         start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
         end: now.toISOString(),
+        segments: 100,
     };
 
     const STORAGE_KEY = 'weather:prefs:v1'
@@ -23,8 +25,7 @@ export default function useUserPrefs(){
 
     const safeMerge = (raw: any): PreferenceData => {
         // Merge with defaults to ensure all fields exist and types are sane
-        const merged = { ...DEFAULT, ...(typeof raw === 'object' && raw ? raw : {}) }
-        return merged
+        return {...DEFAULT, ...(typeof raw === 'object' && raw ? raw : {})}
     }
 
     const loadPreferences = () => {
@@ -50,9 +51,7 @@ export default function useUserPrefs(){
         }
     }
 
-    onMounted(() => {
-        loadPreferences();
-    })
+    loadPreferences()
 
     const persist = () => {
         if (!process.client) return
@@ -61,6 +60,7 @@ export default function useUserPrefs(){
         } catch (err) {
             error.value = (err as Error).message
         }
+        console.log("Persisted preferences!")
     }
 
     const savePreferences = (newPreferences: Partial<PreferenceData>) => {
@@ -88,6 +88,7 @@ export default function useUserPrefs(){
                 power: newVals.power,
                 start: newVals.start,
                 end: newVals.end,
+                segments: newVals.segments,
             };
             callback(updatedPreferences)
             // Also persist on any change to keep storage in sync

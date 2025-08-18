@@ -69,34 +69,38 @@ export interface PreferenceData {
     angle: AngleUnit
     power: PowerUnit
     start: string,
-    end: string
+    end: string,
+    segments: number
 }
 
 export interface WeatherApiResponse {
-    stationtype: string
-    PASSKEY: string
-    dateutc: string
-    tempf: number
-    humidity: number
-    windspeedmph: number
-    windgustmph: number
-    maxdailygust: number
-    winddir: number
-    uv: number
-    solarradiation: number
-    hourlyrainin: number
-    dailyrainin: number
-    weeklyrainin: number
-    monthlyrainin: number
-    totalrainin: number
-    battout: number
-    tempinf: number
-    humidityin: number
-    baromrelin: number
-    baromabsin: number
-    batt_co2: number
-    created_at: string
-    updated_at: string
+    start: string
+    end: string
+    datetime: string
+    averages: {
+        stationtype: string
+        PASSKEY: string
+        dateutc: string
+        tempf: number
+        humidity: number
+        windspeedmph: number
+        windgustmph: number
+        maxdailygust: number
+        winddir: number
+        uv: number
+        solarradiation: number
+        hourlyrainin: number
+        dailyrainin: number
+        weeklyrainin: number
+        monthlyrainin: number
+        totalrainin: number
+        battout: number
+        tempinf: number
+        humidityin: number
+        baromrelin: number
+        baromabsin: number
+        batt_co2: number
+    }
 }
 
 /**

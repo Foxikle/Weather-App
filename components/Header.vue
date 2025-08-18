@@ -22,6 +22,8 @@ import {
 } from '@/components/ui/select'
 import {useToast} from "~/components/ui/toast";
 import useUserPrefs from "~/composables/useUserPrefs";
+import { Input } from "@/components/ui/input"
+
 
 
 const {preferences, loadPreferences, savePreferences, loading, error} = useUserPrefs()
@@ -33,7 +35,8 @@ const formSchema = toTypedSchema(z.object({
   angle: z.string(),
   power: z.string(),
   pressure: z.string(),
-  speed: z.string()
+  speed: z.string(),
+  segments: z.number()
 }))
 
 const {handleSubmit} = useForm({
@@ -336,12 +339,25 @@ const onSubmit = handleSubmit(values => {
                 </FormItem>
               </FormField>
 
+              <h1 class="mt-3 mb-1">Data Fetching</h1>
+
+              <FormField v-slot="{ componentField }" :model-value="preferences.segments" name="segments">
+                <FormItem>
+                  <Label for="pressure">Data resolution</Label>
+                  <FormControl>
+                    <Input type="number" placeholder="100" v-bind="componentField" />
+                  </FormControl>
+                  <FormDescription>
+                    This is how many segments the data is split into.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+
               <Button class="mt-3" type="submit" variant="secondary">
                 Update Preferences
               </Button>
             </form>
-            <h1>Data Fetching</h1>
-
 
           </div>
         </SheetContent>
