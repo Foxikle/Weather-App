@@ -17,17 +17,26 @@ import {
   type WeatherRangeApiResponse,
 } from '~/lib/utils'
 import {useColorMode} from '#imports'
+import {Icon} from "@iconify/vue";
 
 // Page is CSR to simplify chart deps rendering
-definePageMeta({ssr: true})
+definePageMeta({ssr: false})
 
-const {preferences, savePreferences} = useUserPrefs()
+const {range, saveRange} = useDateRange()
+const {preferences} = useUserPrefs()
 
 const df = new DateFormatter('en-US', {dateStyle: 'medium'})
 
+const DEFAULT_RANGE = {
+  start: parseAbsolute(new Date(Date.now() - 24 * 3600 * 1000).toISOString(), getLocalTimeZone()),
+  end: parseAbsolute(new Date().toISOString(), getLocalTimeZone()),
+  isDefault: true
+}
+
 const dateRange = ref<DateRange>({
-  start: parseAbsolute(preferences.value.start ?? new Date(Date.now() - 24 * 3600 * 1000).toISOString(), getLocalTimeZone()),
-  end: parseAbsolute(preferences.value.end ?? new Date().toISOString(), getLocalTimeZone()),
+  start: parseAbsolute(range.value.start ?? new Date(Date.now() - 24 * 3600 * 1000).toISOString(), getLocalTimeZone()),
+  end: parseAbsolute(range.value.end ?? new Date().toISOString(), getLocalTimeZone()),
+  isDefault: range.value.isDefault
 })
 
 const start_date = ref<string>(dateRange.value.start?.toDate(getLocalTimeZone()).toISOString() ?? new Date(Date.now() - 24 * 3600 * 1000).toISOString())
@@ -37,7 +46,7 @@ const segments = ref<number>(preferences.value.segments ?? 100)
 watch(dateRange, (val) => {
   start_date.value = val.start?.toDate(getLocalTimeZone()).toISOString() ?? start_date.value
   end_date.value = val.end?.toDate(getLocalTimeZone()).toISOString() ?? end_date.value
-  savePreferences({start: start_date.value, end: end_date.value})
+  saveRange({start: start_date.value, end: end_date.value, isDefault: false})
   refresh()
 })
 
@@ -45,6 +54,11 @@ const {data, status, error, refresh} = useFetch<WeatherRangeApiResponse[]>(
     'https://weather-api.foxikle.dev/api/v2/range',
     {query: {start_date, end_date, segments}}
 )
+
+const resetRange = () => {
+  dateRange.value = DEFAULT_RANGE
+  saveRange({start: null, end: null})
+}
 
 // Data series
 const temperature = computed(() => (data.value ?? []).map(d => ({
@@ -214,14 +228,19 @@ const batterySeries = computed(() => [
             <CardDescription>Select a date range to explore trends.</CardDescription>
           </div>
           <Popover>
-            <PopoverTrigger as-child>
-              <Button variant="outline">
-                <span v-if="dateRange.start && dateRange.end">{{
-                    df.format(dateRange.start.toDate(getLocalTimeZone()))
-                  }} – {{ df.format(dateRange.end.toDate(getLocalTimeZone())) }}</span>
-                <span v-else>Pick range</span>
+            <div class="flex gap-2">
+              <PopoverTrigger as-child>
+                <Button variant="outline">
+                <span v-if="!dateRange.isDefault" class="flex">
+                  {{df.format(dateRange.start.toDate(getLocalTimeZone()))}} – {{ df.format(dateRange.end.toDate(getLocalTimeZone()))}}
+                </span>
+                  <span v-else>Past 24 Hours</span>
+                </Button>
+              </PopoverTrigger>
+              <Button variant="outline" v-if="!dateRange.isDefault">
+                <Icon @click.prevent="resetRange()" class="text-lg" icon="material-symbols:device-reset-rounded" :inline/>
               </Button>
-            </PopoverTrigger>
+            </div>
             <PopoverContent class="w-auto p-0">
               <RangeCalendar v-model="dateRange" :number-of-months="2"/>
             </PopoverContent>

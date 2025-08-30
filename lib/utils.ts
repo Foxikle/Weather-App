@@ -90,10 +90,14 @@ export interface PreferenceData {
     pressure: PressureUnit
     angle: AngleUnit
     power: PowerUnit
-    start: string,
-    end: string,
     segments: number
     experimentalUI?: boolean
+}
+
+export interface WeatherDateRange {
+    start: string
+    end: string
+    isDefault: boolean
 }
 
 export interface WeatherApiResponse {
