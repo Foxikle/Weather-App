@@ -91,6 +91,8 @@ export interface PreferenceData {
     angle: AngleUnit
     power: PowerUnit
     segments: number
+    start: string
+    end: string
     experimentalUI?: boolean
 }
 
