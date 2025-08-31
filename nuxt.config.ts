@@ -29,4 +29,11 @@ export default defineNuxtConfig({
         plugins: [tailwindcss()],
     },
     compatibilityDate: "2024-07-03",
+    app: {
+        head: {
+            link: [
+                {rel: 'manifest', href: '/manifest.json'}
+            ]
+        }
+    }
 })

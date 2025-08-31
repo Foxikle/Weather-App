@@ -7,23 +7,12 @@ import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTri
 import {toTypedSchema} from "@vee-validate/zod";
 import {z} from "zod";
 import {useForm} from "vee-validate";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-} from '@/components/ui/form'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import {FormControl, FormField, FormItem,} from '@/components/ui/form'
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,} from '@/components/ui/select'
 import {useToast} from "~/components/ui/toast";
 import useUserPrefs from "~/composables/useUserPrefs";
-import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
+import {Input} from "@/components/ui/input"
+import {Switch} from "@/components/ui/switch"
 import {ScrollArea} from "~/components/ui/scroll-area";
 
 
@@ -107,6 +96,8 @@ const onSubmit = handleSubmit(values => {
           <Icon class="h-5 w-5" icon="mdi:github"/>
         </NuxtLink>
       </Button>
+
+
       <Sheet>
         <SheetTrigger as-child>
           <Button as-child variant="ghost" @click="loadPreferences">
@@ -117,262 +108,263 @@ const onSubmit = handleSubmit(values => {
         </SheetTrigger>
 
         <SheetContent>
-          <ScrollArea>
+          <ScrollArea class="flex flex-col items-center justify-center">
             <SheetHeader>
               <SheetTitle>Edit Preferences</SheetTitle>
               <SheetDescription>
                 Make changes to your preferences here. Click save when you're done :)
               </SheetDescription>
             </SheetHeader>
-          </ScrollArea>
 
-          <div class="mt-4 font-semibold text-lg">
-            <form @submit="onSubmit">
-              <h1>Units</h1>
-              <FormField v-slot="{ componentField }" :model-value="preferences.temp" name="temp">
-                <FormItem>
-                  <Label for="temp">Temperature</Label>
-                  <Select id="temp" :default-value="preferences.temp" v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger class="w-[180px]">
-                        <SelectValue placeholder="Select a unit"/>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Temperature Units</SelectLabel>
-                        <SelectItem value="celsius">
-                          Celsius
-                        </SelectItem>
-                        <SelectItem value="fahrenheit">
-                          Fahrenheit
-                        </SelectItem>
-                        <SelectItem value="kelvin">
-                          Kelvin
-                        </SelectItem>
-                        <SelectItem value="rankine">
-                          Rankine
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              </FormField>
+            <div class="mt-4 font-semibold text-lg">
+              <form @submit="onSubmit">
+                <h1>Units</h1>
+                <FormField v-slot="{ componentField }" :model-value="preferences.temp" name="temp">
+                  <FormItem>
+                    <Label for="temp">Temperature</Label>
+                    <Select id="temp" :default-value="preferences.temp" v-bind="componentField">
+                      <FormControl>
+                        <SelectTrigger class="w-[180px]">
+                          <SelectValue placeholder="Select a unit"/>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Temperature Units</SelectLabel>
+                          <SelectItem value="celsius">
+                            Celsius
+                          </SelectItem>
+                          <SelectItem value="fahrenheit">
+                            Fahrenheit
+                          </SelectItem>
+                          <SelectItem value="kelvin">
+                            Kelvin
+                          </SelectItem>
+                          <SelectItem value="rankine">
+                            Rankine
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                </FormField>
 
-              <FormField v-slot="{ componentField }" :model-value="preferences.distance" name="distance">
-                <FormItem>
-                  <Label for="distance">Distance</Label>
-                  <Select id="distance" :default-value="preferences.distance" v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger class="w-[180px]">
-                        <SelectValue placeholder="Select a unit"/>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Length Units</SelectLabel>
-                        <SelectItem value="inches">
-                          Inches
-                        </SelectItem>
-                        <SelectItem value="meters">
-                          Meters
-                        </SelectItem>
-                        <SelectItem value="miles">
-                          Miles
-                        </SelectItem>
-                        <SelectItem value="millimeters">
-                          Millimeters
-                        </SelectItem>
-                        <SelectItem value="centimeters">
-                          Centimeters
-                        </SelectItem>
-                        <SelectItem value="furlongs">
-                          Furlongs
-                        </SelectItem>
-                        <SelectItem value="rods">
-                          Rods
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              </FormField>
+                <FormField v-slot="{ componentField }" :model-value="preferences.distance" name="distance">
+                  <FormItem>
+                    <Label for="distance">Distance</Label>
+                    <Select id="distance" :default-value="preferences.distance" v-bind="componentField">
+                      <FormControl>
+                        <SelectTrigger class="w-[180px]">
+                          <SelectValue placeholder="Select a unit"/>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Length Units</SelectLabel>
+                          <SelectItem value="inches">
+                            Inches
+                          </SelectItem>
+                          <SelectItem value="meters">
+                            Meters
+                          </SelectItem>
+                          <SelectItem value="miles">
+                            Miles
+                          </SelectItem>
+                          <SelectItem value="millimeters">
+                            Millimeters
+                          </SelectItem>
+                          <SelectItem value="centimeters">
+                            Centimeters
+                          </SelectItem>
+                          <SelectItem value="furlongs">
+                            Furlongs
+                          </SelectItem>
+                          <SelectItem value="rods">
+                            Rods
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                </FormField>
 
-              <FormField v-slot="{ componentField }" :model-value="preferences.speed" name="speed">
-                <FormItem>
-                  <Label for="speed">Speed</Label>
-                  <Select id="speed" :default-value="preferences.speed" v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger class="w-[180px]">
-                        <SelectValue placeholder="Select a unit"/>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Speed Units</SelectLabel>
-                        <SelectItem value="miles_per_hour">
-                          Miles/Hr
-                        </SelectItem>
-                        <SelectItem value="feet_per_minute">
-                          Feet/Min
-                        </SelectItem>
-                        <SelectItem value="feet_per_second">
-                          Feet/Sec
-                        </SelectItem>
-                        <SelectItem value="kilometers_per_hour">
-                          Kilometers/Hr
-                        </SelectItem>
-                        <SelectItem value="meters_per_minute">
-                          Meters/Min
-                        </SelectItem>
-                        <SelectItem value="meters_per_second">
-                          Meters/Sec
-                        </SelectItem>
-                        <SelectItem value="furlongs_per_fortnight">
-                          Furlongs/Fortnight
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              </FormField>
+                <FormField v-slot="{ componentField }" :model-value="preferences.speed" name="speed">
+                  <FormItem>
+                    <Label for="speed">Speed</Label>
+                    <Select id="speed" :default-value="preferences.speed" v-bind="componentField">
+                      <FormControl>
+                        <SelectTrigger class="w-[180px]">
+                          <SelectValue placeholder="Select a unit"/>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Speed Units</SelectLabel>
+                          <SelectItem value="miles_per_hour">
+                            Miles/Hr
+                          </SelectItem>
+                          <SelectItem value="feet_per_minute">
+                            Feet/Min
+                          </SelectItem>
+                          <SelectItem value="feet_per_second">
+                            Feet/Sec
+                          </SelectItem>
+                          <SelectItem value="kilometers_per_hour">
+                            Kilometers/Hr
+                          </SelectItem>
+                          <SelectItem value="meters_per_minute">
+                            Meters/Min
+                          </SelectItem>
+                          <SelectItem value="meters_per_second">
+                            Meters/Sec
+                          </SelectItem>
+                          <SelectItem value="furlongs_per_fortnight">
+                            Furlongs/Fortnight
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                </FormField>
 
-              <FormField v-slot="{ componentField }" :model-value="preferences.pressure" name="pressure">
-                <FormItem>
-                  <Label for="pressure">Pressure</Label>
-                  <Select id="pressure" :default-value="preferences.pressure" v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger class="w-[180px]">
-                        <SelectValue placeholder="Select a unit"/>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Pressure Units</SelectLabel>
-                        <SelectItem value="inches_of_mercury">
-                          Inches of Mercury
-                        </SelectItem>
-                        <SelectItem value="millimeters_of_mercury">
-                          Millimeters of Mercury
-                        </SelectItem>
-                        <SelectItem value="pounds_per_square_inch">
-                          Pounds per Square Inch
-                        </SelectItem>
-                        <SelectItem value="pascals">
-                          Pascals
-                        </SelectItem>
-                        <SelectItem value="kilopascals">
-                          Kilopascals
-                        </SelectItem>
-                        <SelectItem value="atmospheres">
-                          Atmospheres
-                        </SelectItem>
-                        <SelectItem value="bar">
-                          Bar
-                        </SelectItem>
-                        <SelectItem value="torr">
-                          Torr
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              </FormField>
+                <FormField v-slot="{ componentField }" :model-value="preferences.pressure" name="pressure">
+                  <FormItem>
+                    <Label for="pressure">Pressure</Label>
+                    <Select id="pressure" :default-value="preferences.pressure" v-bind="componentField">
+                      <FormControl>
+                        <SelectTrigger class="w-[180px]">
+                          <SelectValue placeholder="Select a unit"/>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Pressure Units</SelectLabel>
+                          <SelectItem value="inches_of_mercury">
+                            Inches of Mercury
+                          </SelectItem>
+                          <SelectItem value="millimeters_of_mercury">
+                            Millimeters of Mercury
+                          </SelectItem>
+                          <SelectItem value="pounds_per_square_inch">
+                            Pounds per Square Inch
+                          </SelectItem>
+                          <SelectItem value="pascals">
+                            Pascals
+                          </SelectItem>
+                          <SelectItem value="kilopascals">
+                            Kilopascals
+                          </SelectItem>
+                          <SelectItem value="atmospheres">
+                            Atmospheres
+                          </SelectItem>
+                          <SelectItem value="bar">
+                            Bar
+                          </SelectItem>
+                          <SelectItem value="torr">
+                            Torr
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                </FormField>
 
-              <FormField v-slot="{ componentField }" :model-value="preferences.angle" name="angle">
-                <FormItem>
-                  <Label for="angle">Angle</Label>
-                  <Select id="angle" :default-value="preferences.angle" v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger class="w-[180px]">
-                        <SelectValue placeholder="Select a unit"/>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Angle Measure Units</SelectLabel>
-                        <SelectItem value="radians">
-                          Radians
-                        </SelectItem>
-                        <SelectItem value="degrees">
-                          Degrees
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              </FormField>
+                <FormField v-slot="{ componentField }" :model-value="preferences.angle" name="angle">
+                  <FormItem>
+                    <Label for="angle">Angle</Label>
+                    <Select id="angle" :default-value="preferences.angle" v-bind="componentField">
+                      <FormControl>
+                        <SelectTrigger class="w-[180px]">
+                          <SelectValue placeholder="Select a unit"/>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Angle Measure Units</SelectLabel>
+                          <SelectItem value="radians">
+                            Radians
+                          </SelectItem>
+                          <SelectItem value="degrees">
+                            Degrees
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                </FormField>
 
-              <FormField v-slot="{ componentField }" :model-value="preferences.power" name="power">
-                <FormItem>
-                  <Label for="power">Power</Label>
-                  <Select id="power" :default-value="preferences.power" v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger class="w-[180px]">
-                        <SelectValue placeholder="Select a unit"/>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Power Units</SelectLabel>
-                        <SelectItem value="horsepower">
-                          Horsepower
-                        </SelectItem>
-                        <SelectItem value="watt">
-                          Watt
-                        </SelectItem>
-                        <SelectItem value="calories_per_second">
-                          Calories per Second
-                        </SelectItem>
-                        <SelectItem value="btu_per_hr">
-                          BTU/Hr
-                        </SelectItem>
-                        <SelectItem value="decibel_milliwatts">
-                          Decibel-Miliwatts
-                        </SelectItem>
-                        <SelectItem value="megawatts">
-                          Megawatts
-                        </SelectItem>
-                        <SelectItem value="kilowatts">
-                          Kilowatts
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              </FormField>
+                <FormField v-slot="{ componentField }" :model-value="preferences.power" name="power">
+                  <FormItem>
+                    <Label for="power">Power</Label>
+                    <Select id="power" :default-value="preferences.power" v-bind="componentField">
+                      <FormControl>
+                        <SelectTrigger class="w-[180px]">
+                          <SelectValue placeholder="Select a unit"/>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Power Units</SelectLabel>
+                          <SelectItem value="horsepower">
+                            Horsepower
+                          </SelectItem>
+                          <SelectItem value="watt">
+                            Watt
+                          </SelectItem>
+                          <SelectItem value="calories_per_second">
+                            Calories per Second
+                          </SelectItem>
+                          <SelectItem value="btu_per_hr">
+                            BTU/Hr
+                          </SelectItem>
+                          <SelectItem value="decibel_milliwatts">
+                            Decibel-Miliwatts
+                          </SelectItem>
+                          <SelectItem value="megawatts">
+                            Megawatts
+                          </SelectItem>
+                          <SelectItem value="kilowatts">
+                            Kilowatts
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                </FormField>
 
-              <h1 class="mt-3 mb-1">Experimental</h1>
+                <h1 class="mt-3 mb-1">Experimental</h1>
 
-              <div class="flex items-center justify-between py-2">
-                <div>
-                  <Label for="experimental-ui">Experimental UI</Label>
-                  <p class="text-sm text-muted-foreground">Redirect Home and History to staged pages</p>
+                <div class="flex items-center justify-between py-2">
+                  <div>
+                    <Label for="experimental-ui">Experimental UI</Label>
+                    <p class="text-sm text-muted-foreground">Redirect Home and History to staged pages</p>
+                  </div>
+                  <Switch id="experimental-ui" :checked="preferences.experimentalUI === true"
+                          @update:checked="(v:boolean) => savePreferences({ experimentalUI: v })"/>
                 </div>
-                <Switch id="experimental-ui" :checked="preferences.experimentalUI === true" @update:checked="(v:boolean) => savePreferences({ experimentalUI: v })" />
-              </div>
 
-              <h1 class="mt-3 mb-1">Data Fetching</h1>
+                <h1 class="mt-3 mb-1">Data Fetching</h1>
 
-              <FormField v-slot="{ componentField }" :model-value="preferences.segments" name="segments">
-                <FormItem>
-                  <Label for="pressure">Data resolution</Label>
-                  <FormControl>
-                    <Input type="number" placeholder="100" v-bind="componentField" />
-                  </FormControl>
-                  <FormDescription>
-                    This is how many segments the data is split into.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
+                <FormField v-slot="{ componentField }" :model-value="preferences.segments" name="segments">
+                  <FormItem>
+                    <Label for="pressure">Data resolution</Label>
+                    <FormControl>
+                      <Input placeholder="100" type="number" v-bind="componentField"/>
+                    </FormControl>
+                    <FormDescription>
+                      This is how many segments the data is split into.
+                    </FormDescription>
+                    <FormMessage/>
+                  </FormItem>
+                </FormField>
 
-              <Button class="mt-3" type="submit" variant="secondary">
-                Update Preferences
-              </Button>
-            </form>
+                <Button class="mt-3" type="submit" variant="secondary">
+                  Update Preferences
+                </Button>
+              </form>
 
-          </div>
+            </div>
+          </ScrollArea>
         </SheetContent>
       </Sheet>
     </div>
