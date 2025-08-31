@@ -91,7 +91,7 @@ export interface PreferenceData {
     angle: AngleUnit
     power: PowerUnit
     segments: number
-    start: string
+    start: string //Todo: Remove this when old ui is removed
     end: string
     experimentalUI?: boolean
 }

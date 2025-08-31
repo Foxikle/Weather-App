@@ -24,6 +24,7 @@ import {useToast} from "~/components/ui/toast";
 import useUserPrefs from "~/composables/useUserPrefs";
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
+import {ScrollArea} from "~/components/ui/scroll-area";
 
 
 const {preferences, loadPreferences, savePreferences, loading, error} = useUserPrefs()
@@ -116,12 +117,14 @@ const onSubmit = handleSubmit(values => {
         </SheetTrigger>
 
         <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Edit Preferences</SheetTitle>
-            <SheetDescription>
-              Make changes to your preferences here. Click save when you're done :)
-            </SheetDescription>
-          </SheetHeader>
+          <ScrollArea>
+            <SheetHeader>
+              <SheetTitle>Edit Preferences</SheetTitle>
+              <SheetDescription>
+                Make changes to your preferences here. Click save when you're done :)
+              </SheetDescription>
+            </SheetHeader>
+          </ScrollArea>
 
           <div class="mt-4 font-semibold text-lg">
             <form @submit="onSubmit">
