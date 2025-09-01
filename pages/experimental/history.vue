@@ -224,7 +224,7 @@ const batterySeries = computed(() => [
       <Card>
         <CardHeader class="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
           <div>
-            <CardTitle class="text-3xl md:text-4xl">History (Staged)</CardTitle>
+            <CardTitle class="text-3xl md:text-4xl">Weather History</CardTitle>
             <CardDescription>Select a date range to explore trends.</CardDescription>
           </div>
           <Popover>

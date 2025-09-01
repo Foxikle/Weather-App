@@ -56,8 +56,8 @@ const barAbs = computed(() => fresh.value?.baromabsin ?? data.value?.baromabsin 
 const rainDay = computed(() => fresh.value?.dailyrainin ?? data.value?.dailyrainin ?? 0)
 
 useServerSeoMeta({
-  title: 'Temp Home — Staged',
-  description: 'Staged modern UI for current weather',
+  title: 'Home',
+  description: 'A modern UI for current weather',
 })
 </script>
 
@@ -85,7 +85,6 @@ useServerSeoMeta({
             </CardDescription>
           </div>
           <div class="flex items-center gap-2 text-sm text-muted-foreground">
-            <span class="px-2 py-1 rounded bg-muted">Staged</span>
             <span class="px-2 py-1 rounded bg-muted">{{ uv }} UV • {{ getUVIndex(uv) }}</span>
           </div>
         </CardHeader>
