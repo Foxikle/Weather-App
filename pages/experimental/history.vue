@@ -100,7 +100,7 @@ const rain = computed(() => (data.value ?? []).map(d => ({
   Hourly: convertDistance(d.averages.hourlyrainin, preferences.value.distance),
   Daily: convertDistance(d.averages.dailyrainin, preferences.value.distance),
   Weekly: convertDistance(d.averages.weeklyrainin, preferences.value.distance),
-  Monthly: convertDistance(d.averages.dailyrainin, preferences.value.distance),
+  Monthly: convertDistance(d.averages.monthlyrainin, preferences.value.distance),
   Total: convertDistance(d.averages.totalrainin, preferences.value.distance),
 })))
 
