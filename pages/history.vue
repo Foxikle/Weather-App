@@ -153,7 +153,7 @@ const rain = computed(() => {
       Hourly: convertDistance(item.averages.hourlyrainin, preferences.value.distance),
       Daily: convertDistance(item.averages.dailyrainin, preferences.value.distance),
       Weekly: convertDistance(item.averages.weeklyrainin, preferences.value.distance),
-      Monthly: convertDistance(item.averages.dailyrainin, preferences.value.distance),
+      Monthly: convertDistance(item.averages.monthlyrainin, preferences.value.distance),
       Total: convertDistance(item.averages.totalrainin, preferences.value.distance),
     }));
   }
