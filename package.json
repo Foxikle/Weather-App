@@ -27,7 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.400.0",
-    "nuxt": "^3.12.3",
+    "nuxt": "^4.4.2",
     "nuxt-highcharts": "^3.1.1",
     "radix-vue": "^1.8.5",
     "reka-ui": "^2.5.0",
