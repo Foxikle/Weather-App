@@ -75,7 +75,6 @@ const resetToDefaults = () => {
     pressure: 'inches_of_mercury',
     speed: 'miles_per_hour',
     segments: 100,
-    experimentalUI: false
   }
   savePreferences(defaults)
   toast({
@@ -317,32 +316,6 @@ useServerSeoMeta({
                   <FormMessage/>
                 </FormItem>
               </FormField>
-            </CardContent>
-          </Card>
-
-          <!-- Experimental Features -->
-          <Card>
-            <CardHeader>
-              <CardTitle class="flex items-center gap-2">
-                <Icon class="h-5 w-5" icon="material-symbols:science"/>
-                Experimental Features
-              </CardTitle>
-              <CardDescription>Enable experimental features and UI improvements.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div class="flex items-center justify-between py-4">
-                <div class="space-y-1">
-                  <Label for="experimental-ui">Modern UI</Label>
-                  <p class="text-sm text-muted-foreground">
-                    Use the new experimental interface for Home and History pages
-                  </p>
-                </div>
-                <Switch
-                    id="experimental-ui"
-                    :checked="preferences.experimentalUI === true"
-                    @update:checked="(v: boolean) => savePreferences({ experimentalUI: v })"
-                />
-              </div>
             </CardContent>
           </Card>
 

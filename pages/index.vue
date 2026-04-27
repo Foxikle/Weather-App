@@ -1,416 +1,215 @@
-<script lang="ts" setup>
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from '@/components/ui/card'
+<script setup lang="ts">
+import Header from '~/components/Header.vue'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
+import { Skeleton } from '~/components/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
+import { Progress } from '~/components/ui/progress'
+import useUserPrefs from '~/composables/useUserPrefs'
 import {
   calculateDewPoint,
   convertPressure,
+  convertSpeed,
   convertTemperature,
   getUVIndex,
   toAbbreviation,
-  type WeatherApiResponse
-} from "~/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue
-} from "~/components/ui/select";
-import {Progress} from "~/components/ui/progress";
-import useUserPrefs from "~/composables/useUserPrefs";
+  type WeatherApiResponse,
+} from '~/lib/utils'
 
-const { data, status, error } = useFetch<WeatherApiResponse>('https://weather-api.foxikle.dev/api/v1/latest');
+// Fetch latest weather snapshot
+const { data, status, error } = useFetch<WeatherApiResponse>('https://weather-api.foxikle.dev/api/v1/latest')
 
-const refreshedData = ref<WeatherApiResponse | null>(data.value ?? null);
-const refreshError = ref<string | null>(error.value ? String(error.value) : null);
-const refreshStatus = ref<'idle' | 'loading' | 'success' | 'error'>('idle');
+// Client refresh to avoid SSG baking
+const fresh = ref<WeatherApiResponse | null>(data.value ?? null)
+const refreshState = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
+const refreshErr = ref<string | null>(error.value ? String(error.value) : null)
 
 onMounted(async () => {
-  refreshStatus.value = 'loading';
+  refreshState.value = 'loading'
   try {
-    const response = await fetch('https://weather-api.foxikle.dev/api/v1/latest');
-    if (!response.ok) throw new Error('Failed to fetch data: ' + response.body);
-    refreshedData.value = await response.json();
-    refreshStatus.value = 'success';
-  } catch (err) {
-    refreshError.value = err;
-    console.error(err);
-    refreshStatus.value = 'error';
+    const res = await fetch('https://weather-api.foxikle.dev/api/v1/latest')
+    if (!res.ok) throw new Error('Failed to fetch latest data')
+    fresh.value = await res.json()
+    refreshState.value = 'success'
+  } catch (e: any) {
+    refreshErr.value = e?.message ?? String(e)
+    refreshState.value = 'error'
   }
-});
+})
 
-const {preferences} = useUserPrefs()
+const { preferences } = useUserPrefs()
 
-const tempIn = data.value?.tempinf ?? 0;
-const humidityIn = data.value?.humidityin ?? 0;
-const temp = data.value?.tempf ?? 0;
-const humidity = data.value?.humidity ?? 0;
-const dewpointIn = computed(() => calculateDewPoint(tempIn, preferences.value.temp, humidityIn));
-const dewpoint = computed(() => calculateDewPoint(temp, preferences.value.temp, humidity));
-const windAngle = ref<number>(data.value?.winddir ?? 0);
-const uv = data.value?.uv ?? 0;
-const solarIntensity = data.value?.solarradiation ?? 0;
-const baromRel = data.value?.baromrelin ?? 0;
-const baromAbs = data.value?.baromabsin ?? 0;
-const inside_bat = data.value?.batt_co2 ?? 1;
-const outside_bad = data.value?.battout ?? 1;
-let rerenderKey = 0;
-
-const rainfallMap = new Map<string, number>();
-rainfallMap.set('hourly-rain', data.value?.hourlyrainin ?? 0);
-rainfallMap.set('daily-rain', data.value?.dailyrainin ?? 0);
-rainfallMap.set('weekly-rain', data.value?.weeklyrainin ?? 0);
-rainfallMap.set('monthly-rain', data.value?.monthlyrainin ?? 0);
-rainfallMap.set('total-rain', data.value?.totalrainin ?? 0);
-
-const windMap = new Map<string, number>();
-windMap.set('wind-speed', data.value?.windspeedmph ?? 0);
-windMap.set('gust-speed', data.value?.windgustmph ?? 0);
-windMap.set('max-gust', data.value?.maxdailygust ?? 0);
-
-const rainfall = ref<string>('hourly-rain');
-const wind = ref<string>('wind-speed');
+const now = computed(() => new Date())
+const created = computed(() => new Date(fresh.value?.created_at ?? data.value?.created_at ?? now.value.toISOString()))
+const tempOut = computed(() => fresh.value?.tempf ?? data.value?.tempf ?? 0)
+const tempIn = computed(() => fresh.value?.tempinf ?? data.value?.tempinf ?? 0)
+const rhOut = computed(() => fresh.value?.humidity ?? data.value?.humidity ?? 0)
+const rhIn = computed(() => fresh.value?.humidityin ?? data.value?.humidityin ?? 0)
+const dpOut = computed(() => calculateDewPoint(tempOut.value, preferences.value.temp, rhOut.value))
+const dpIn = computed(() => calculateDewPoint(tempIn.value, preferences.value.temp, rhIn.value))
+const windSpeed = computed(() => fresh.value?.windspeedmph ?? data.value?.windspeedmph ?? 0)
+const windGust = computed(() => fresh.value?.windgustmph ?? data.value?.windgustmph ?? 0)
+const windDir = computed(() => fresh.value?.winddir ?? data.value?.winddir ?? 0)
+const uv = computed(() => fresh.value?.uv ?? data.value?.uv ?? 0)
+const solar = computed(() => fresh.value?.solarradiation ?? data.value?.solarradiation ?? 0)
+const barRel = computed(() => fresh.value?.baromrelin ?? data.value?.baromrelin ?? 0)
+const barAbs = computed(() => fresh.value?.baromabsin ?? data.value?.baromabsin ?? 0)
+const rainDay = computed(() => fresh.value?.dailyrainin ?? data.value?.dailyrainin ?? 0)
 
 useServerSeoMeta({
-  title: 'Current Weather',
-  ogTitle: 'Current Weather',
-  description: `Foxikle's weather website! The current temperature is ${temp}°F. The current dewpoint is ${dewpoint.value}°F. The relative humidity is ${humidity}!`,
-  ogDescription: `Foxikle's weather website! The current temperature is ${temp}°F. The current dewpoint is ${dewpoint.value}°F. The relative humidity is ${humidity}!`,
-  author: 'Foxikle',
-  ogUrl: 'https://weather.foxikle.dev',
-});
-
+  title: 'Home',
+  description: 'A modern UI for current weather',
+})
 </script>
 
 <template>
-  <h1 v-if="(status === 'error') || (refreshStatus === 'error')">
-    ERROR: {{  }}
-  </h1>
-  <h1 class="text-5xl text-center m-6"> Current Weather </h1>
+  <div class="container mx-auto max-w-7xl px-4 py-4">
 
-  <div v-if="status === 'success'">
-    <div class="flex text-center m-6">
-      <Card class="m-3 p-6 w-full">
-        <CardTitle>Air Properties</CardTitle>
-        <CardDescription>Tempertature, Relative Humidity, and Dewpoint.</CardDescription>
-        <CardContent class="mt-8">
-          <h1 class="font-semibold text-2xl">Inside</h1>
-          <hr>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 self-center gap-8 mt-4 ">
-            <Card class="w-auto h-40 p-2">
-              <CardTitle class="m-1">
-                Temperature
-              </CardTitle>
-              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
-                {{ convertTemperature(tempIn, preferences.temp) }}{{toAbbreviation(preferences.temp)}}
-              </CardContent>
-            </Card>
-            <Card class="w-auto h-40 p-2">
-              <CardTitle class="m-1">
-                Relative Humidity
-              </CardTitle>
-              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
-                {{ humidityIn }}%
-              </CardContent>
-            </Card>
-            <Card class="w-auto h-40 p-2 md:col-span-2 lg:col-span-1">
-              <CardTitle class="m-1">
-                Dewpoint
-              </CardTitle>
-              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
-                {{ dewpointIn }}{{toAbbreviation(preferences.temp)}}
-              </CardContent>
-            </Card>
-          </div>
-          <!--             Exterrior   -->
-          <h1 class="font-semibold text-2xl mt-5">Outside</h1>
-          <hr>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 self-center gap-8 mt-4 ">
-            <Card class="w-auto h-40 p-2">
-              <CardTitle class="m-1">
-                Temperature
-              </CardTitle>
-              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
-                {{  convertTemperature(temp, preferences.temp) }}{{toAbbreviation(preferences.temp)}}
-              </CardContent>
-            </Card>
-            <Card class="w-auto h-40 p-2">
-              <CardTitle class="m-1">
-                Relative Humidity
-              </CardTitle>
-              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
-                {{ humidity }}%
-              </CardContent>
-            </Card>
-            <Card class="w-auto h-40 p-2 md:col-span-2 lg:col-span-1">
-              <CardTitle class="m-1">
-                Dewpoint
-              </CardTitle>
-              <CardContent class="text-4xl md:text-6xl mt-4 text-center">
-                {{ dewpoint }}{{toAbbreviation(preferences.temp)}}
-              </CardContent>
-            </Card>
-          </div>
-
-        </CardContent>
-      </Card>
-    </div>
-
-    <div class="flex m-6">
-      <Card class="m-3 p-6 w-full text-center">
-        <CardTitle>Environment Properties</CardTitle>
-        <CardDescription>Pressure, Rainfall, Light, and Wind.</CardDescription>
-        <CardContent class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <!-- Rainfall -->
-          <Card class="w-full mx-3">
-            <CardTitle class="mt-3">Rainfall</CardTitle>
-            <CardHeader class="flex items-center mt-[-15px]">
-              <Select v-model="rainfall" default-value="hourly-rain" required>
-                <SelectTrigger class="w-[180px]">
-                  <SelectValue placeholder="Select a period"/>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Rainfall Periods</SelectLabel>
-                    <SelectItem value="hourly-rain">
-                      Hourly
-                    </SelectItem>
-                    <SelectItem value="daily-rain">
-                      Daily
-                    </SelectItem>
-                    <SelectItem value="weekly-rain">
-                      Weekly
-                    </SelectItem>
-                    <SelectItem value="monthly-rain">
-                      Monthly
-                    </SelectItem>
-                    <SelectItem value="total-rain">
-                      All Time
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <CardContent class="mt-5">
-              <span class="text-4xl md:text-5xl relative">
-                {{ rainfallMap.get(rainfall) }} {{toAbbreviation(preferences.distance)}}
-              </span>
-              </CardContent>
-            </CardHeader>
-          </Card>
-
-          <!-- Wind -->
-          <Card class=" w-full mx-3">
-            <CardTitle class="mt-3">Wind</CardTitle>
-            <CardHeader class="flex items-center mt-[-15px]">
-              <Select v-model="wind" default-value="wind-speed">
-                <SelectTrigger class="w-[180px]">
-                  <SelectValue placeholder="Select a period"/>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Wind Speeds</SelectLabel>
-                    <SelectItem value="wind-speed">
-                      Wind Speed
-                    </SelectItem>
-                    <SelectItem value="gust-speed">
-                      Gust Speed
-                    </SelectItem>
-                    <SelectItem value="max-gust">
-                      Max Gust Speed
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </CardHeader>
-            <CardContent class="flex items-center justify-center">
-              <ClientOnly>
-                <template #fallback>
-                  <Skeleton class="h-28 w-28 rounded-full" />
-                </template>
-                <WindDirection :angle="windAngle" :rerender="rerenderKey" :speed="windMap.get(wind).toFixed(1)"/>
-              </ClientOnly>
-            </CardContent>
-          </Card>
-
-          <!-- Light -->
-          <Card class=" w-full mx-3">
-            <CardTitle class="mt-3">Light</CardTitle>
-
-            <CardContent>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                <Card>
-                  <CardTitle class="text-xl font-normal">
-                    UV Index
-                  </CardTitle>
-                  <CardContent>
-                    {{ uv }} - {{ getUVIndex(uv) }}
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardTitle class="text-xl font-normal">
-                    Solar Radiation
-                  </CardTitle>
-                  <CardContent>
-                    {{ solarIntensity }} {{toAbbreviation(preferences.power)}}
-                  </CardContent>
-                </Card>
-
-              </div>
-            </CardContent>
-          </Card>
-
-          <!-- Barometric Pressure -->
-          <Card class=" w-full mx-3">
-            <CardTitle class="mt-3">Barometric Pressure</CardTitle>
-
-            <CardContent>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                <Card>
-                  <CardTitle class="text-xl font-normal">
-                    Absolute
-                  </CardTitle>
-                  <CardContent>
-                    {{ convertPressure(baromAbs, preferences.pressure) }} <span class="font-light text-sm italic">{{toAbbreviation(preferences.pressure)}}</span>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardTitle class="text-xl font-normal">
-                    Relative
-                  </CardTitle>
-                  <CardContent>
-                    {{ convertPressure(baromRel, preferences.pressure) }} <span class="font-light text-sm italic">{{toAbbreviation(preferences.pressure)}}</span>
-                  </CardContent>
-                </Card>
-
-              </div>
-            </CardContent>
-          </Card>
-
-          <!--Device Battery Levels-->
-          <Card class="col-span-full w-full mx-3">
-            <CardTitle class="mt-3">Device Battery Levels</CardTitle>
-
-            <CardContent class="flex flex-col">
+    <div class="mt-6 grid gap-6">
+      <!-- Hero -->
+      <Card class="overflow-hidden">
+        <CardHeader class="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
+          <div>
+            <CardTitle class="text-3xl md:text-4xl">Current Conditions</CardTitle>
+            <CardDescription>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Label for="sensor_array">Sensor Array</Label>
-                    <Progress id="sensor_array" :model-value="outside_bad * 100"/>
+                    Updated <span class="font-medium">{{ now.toLocaleString() }}</span>
                   </TooltipTrigger>
-                  <TooltipContent align="center" side="bottom">
-                    {{ outside_bad * 100 }}
+                  <TooltipContent>
+                    Snapshot timestamp: <span class="font-medium">{{ created.toLocaleString() }}</span>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Label for="base_station">Base Station</Label>
-                    <Progress id="base_station" :model-value="inside_bat * 100"/>
-                  </TooltipTrigger>
-                  <TooltipContent align="center" side="bottom">
-                    {{ inside_bat * 100 }}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-            </CardContent>
-          </Card>
-
-        </CardContent>
-      </Card>
-    </div>
-  </div>
-
-  <div v-else>
-    <div class="flex text-center m-6">
-      <Card class="m-3 p-6 w-full">
-        <CardTitle>Air Properties</CardTitle>
-        <CardDescription>Tempertature, Relative Humidity, and Dewpoint.</CardDescription>
-        <CardContent class="mt-8">
-          <h1 class="font-semibold text-2xl">Inside</h1>
-          <hr>
-          <div class="grid grid-cols-3 self-center gap-8 mt-4 ">
-            <Skeleton class="w-auto h-40 p-2"/>
-            <Skeleton class="w-auto h-40 p-2"/>
-            <Skeleton class="w-auto h-40 p-2"/>
+              <span v-if="refreshState === 'error'" class="text-destructive ml-2">(live refresh failed)</span>
+            </CardDescription>
           </div>
-          <!--             Exterrior   -->
-          <h1 class="font-semibold text-2xl mt-5">Outside</h1>
-          <hr>
-          <div class="grid grid-cols-3 self-center gap-8 mt-4 ">
-            <Skeleton class="w-auto h-40 p-2"/>
-            <Skeleton class="w-auto h-40 p-2"/>
-            <Skeleton class="w-auto h-40 p-2"/>
+          <div class="flex items-center gap-2 text-sm text-muted-foreground">
+            <span class="px-2 py-1 rounded bg-muted">{{ uv }} UV • {{ getUVIndex(uv) }}</span>
+          </div>
+        </CardHeader>
+        <hr class="border-t border-border" />
+        <CardContent class="py-6">
+          <div v-if="status === 'pending' && !fresh" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Skeleton class="h-36" />
+            <Skeleton class="h-36" />
+            <Skeleton class="h-36" />
           </div>
 
+          <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardDescription>Outside</CardDescription>
+                <CardTitle class="text-4xl">
+                  {{ convertTemperature(tempOut, preferences.temp) }}{{ toAbbreviation(preferences.temp) }}
+                </CardTitle>
+              </CardHeader>
+              <CardContent class="grid grid-cols-2 gap-4">
+                <div>
+                  <div class="text-sm text-muted-foreground">Humidity</div>
+                  <div class="text-xl">{{ rhOut }}%</div>
+                </div>
+                <div>
+                  <div class="text-sm text-muted-foreground">Dew Point</div>
+                  <div class="text-xl">{{ dpOut }}{{ toAbbreviation(preferences.temp) }}</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardDescription>Inside</CardDescription>
+                <CardTitle class="text-4xl">
+                  {{ convertTemperature(tempIn, preferences.temp) }}{{ toAbbreviation(preferences.temp) }}
+                </CardTitle>
+              </CardHeader>
+              <CardContent class="grid grid-cols-2 gap-4">
+                <div>
+                  <div class="text-sm text-muted-foreground">Humidity</div>
+                  <div class="text-xl">{{ rhIn }}%</div>
+                </div>
+                <div>
+                  <div class="text-sm text-muted-foreground">Dew Point</div>
+                  <div class="text-xl">{{ dpIn }}{{ toAbbreviation(preferences.temp) }}</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardDescription>Wind</CardDescription>
+                <CardTitle class="text-3xl">
+                  {{ convertSpeed(windSpeed, preferences.speed) }} {{ toAbbreviation(preferences.speed) }}
+                </CardTitle>
+              </CardHeader>
+              <CardContent class="grid grid-cols-2 gap-4 items-end">
+                <div>
+                  <div class="text-sm text-muted-foreground">Gust</div>
+                  <div class="text-xl">{{ convertSpeed(windGust, preferences.speed) }} {{ toAbbreviation(preferences.speed) }}</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm text-muted-foreground">Direction</div>
+                  <div class="text-xl">{{ windDir }}°</div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </CardContent>
       </Card>
-    </div>
 
-    <div class="flex m-6">
-      <Card class="m-3 p-6 w-full text-center">
-        <CardTitle>Environment Properties</CardTitle>
-        <CardDescription>Pressure, Rainfall, Light, and Wind.</CardDescription>
-        <CardContent class="mt-4 grid grid-cols-2 gap-8">
+      <!-- Secondary metrics -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardDescription>Barometric Pressure</CardDescription>
+            <CardTitle class="text-2xl">{{ convertPressure(barRel, preferences.pressure) }} {{ toAbbreviation(preferences.pressure) }}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="text-sm text-muted-foreground">Absolute: {{ convertPressure(barAbs, preferences.pressure) }} {{ toAbbreviation(preferences.pressure) }}</div>
+          </CardContent>
+        </Card>
 
-          <!-- Rainfall -->
-          <Card class="w-full mx-3">
-            <CardTitle class="mt-3">Rainfall</CardTitle>
-            <CardHeader class="flex items-center mt-[-15px]">
-              <Skeleton class="w-44 h-10"/>
-              <CardContent class="mt-5">
-                <Skeleton class="h-28 w-28"/>
-              </CardContent>
-            </CardHeader>
-          </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Solar Radiation</CardDescription>
+            <CardTitle class="text-2xl">{{ solar }} {{ toAbbreviation(preferences.power) }}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="text-sm text-muted-foreground">UV Index: {{ uv }} • {{ getUVIndex(uv) }}</div>
+          </CardContent>
+        </Card>
 
-          <!-- Wind -->
-          <Card class=" w-full mx-3">
-            <CardTitle class="mt-3">Wind</CardTitle>
-            <CardHeader class="flex items-center mt-[-15px]">
-              <Skeleton class="w-44 h-10"/>
-              <CardContent class="mt-5">
-                <Skeleton class="h-28 w-28"/>
-              </CardContent>
-            </CardHeader>
-          </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Rain (Today)</CardDescription>
+            <CardTitle class="text-2xl">{{ rainDay }} {{ toAbbreviation(preferences.distance) }}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger class="w-full">
+                  <div class="flex items-center justify-between text-sm">
+                    <span>Gauge</span>
+                    <span>{{ (Math.min(rainDay, 1) * 100).toFixed(0) }}%</span>
+                  </div>
+                  <Progress :model-value="Math.min(rainDay, 1) * 100" />
+                </TooltipTrigger>
+                <TooltipContent>Scaled to 1 {{ toAbbreviation(preferences.distance) }}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </CardContent>
+        </Card>
+      </div>
 
-          <!-- Light -->
-          <Card class=" w-full mx-3">
-            <CardTitle class="mt-3">Light</CardTitle>
-
-            <CardContent>
-              <div class="grid grid-cols-2 gap-4 mt-3">
-                <Skeleton class="h-24"/>
-                <Skeleton class="h-24"/>
-              </div>
-            </CardContent>
-          </Card>
-
-          <!-- Barometric Pressure -->
-          <Card class=" w-full mx-3">
-            <CardTitle class="mt-3">Barometric Pressure</CardTitle>
-
-            <CardContent>
-              <div class="grid grid-cols-2 gap-4 mt-3">
-                <Skeleton class="h-24"/>
-                <Skeleton class="h-24"/>
-              </div>
-            </CardContent>
-          </Card>
-
-          <!--Device Battery Levels-->
-          <Card class="col-span-full w-full mx-3">
-            <CardTitle class="mt-3">Device Battery Levels</CardTitle>
-            <CardContent class="flex flex-col">
-              <Skeleton class="h-4 mt-2"/>
-              <Skeleton class="h-4 mt-2"/>
-            </CardContent>
-          </Card>
-        </CardContent>
+      <!-- System status -->
+      <Card>
+        <CardHeader>
+          <CardTitle>System</CardTitle>
+          <CardDescription>
+            Status: <span :class="{'text-green-600': refreshState==='success', 'text-yellow-600': refreshState==='loading', 'text-red-600': refreshState==='error'}">{{ refreshState }}</span>
+            <span v-if="refreshErr" class="ml-2 text-destructive">{{ refreshErr }}</span>
+          </CardDescription>
+        </CardHeader>
       </Card>
     </div>
   </div>
